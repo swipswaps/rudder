@@ -288,7 +288,7 @@ case object OstypeComparator extends CriterionType {
 case object OsNameComparator extends CriterionType { 
   import net.liftweb.http.S
   
-  val osNames = List(Centos, Debian, Fedora, Redhat, Suse, Ubuntu, UnknownWindowsType)
+  val osNames = List(Centos, Debian, Fedora, Redhat, Suse, Ubuntu, Android, UnknownWindowsType)
   override def comparators = Seq(Equals, NotEquals)
   override protected def validateSubCase(v:String,comparator:CriterionComparator) = {
     if(null == v || v.length == 0) Failure("Empty string not allowed") else Full(v)
