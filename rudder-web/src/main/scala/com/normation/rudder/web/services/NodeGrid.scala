@@ -241,6 +241,7 @@ class NodeGrid(getNodeAndMachine:LDAPFullInventoryRepository) extends Loggable {
       sm <- getNodeAndMachine.get(NodeId(arg.id),status)
     } yield (sm,arg.jsid) ) match {
       case Full((sm,jsid)) => 
+        logger.info("here panned content = %s".format(DisplayNode.showPannedContent(sm)))
         SetHtml(jsid, DisplayNode.showPannedContent(sm)) &
         DisplayNode.jsInit(sm.node.main.id, sm.node.softwareIds, "", Some("node_tabs"))
       case e:EmptyBox => 

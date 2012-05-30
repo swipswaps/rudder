@@ -56,6 +56,7 @@ import net.liftweb.http.Templates
 import org.joda.time.DateTime
 import com.normation.rudder.services.servers.RemoveNodeService
 import com.normation.rudder.web.model.CurrentUser
+import org.slf4j.LoggerFactory
 
 /**
  * A service used to display details about a server 
@@ -80,7 +81,7 @@ object DisplayNode extends Loggable {
       throw new TechnicalException("Template for server details not found. I was looking for %s.html".format(templatePath.mkString("/")))
     case Full(n) => n
   }
-  
+  val logg =    LoggerFactory.getLogger("logger here")
   
   private[this] val deleteNodePopupHtmlId = "deleteNodePopupHtmlId"
   private[this] val errorPopupHtmlId = "errorPopupHtmlId"
@@ -115,7 +116,7 @@ object DisplayNode extends Loggable {
     val softGridDataId = htmlId(jsId,"soft_grid_data_")
     val softGridId     = htmlId(jsId,"soft_grid_")
     val softPanelId    = htmlId(jsId,"sd_soft_")
-    val eltIds         = List("fs", "net","bios", "controllers", "memories", "ports", "processors", "slots", "sounds", "storages", "videos").
+    val eltIds         = List("rudder_agents", "os_details","process",  "var", "general", "fs", "net","bios", "controllers", "memories", "ports", "processors", "slots", "sounds", "storages", "videos").
                            map(x => htmlId(jsId, x+ "_grid_"))
       
     JsRaw("var "+softGridDataId +"= null") & 
@@ -182,7 +183,7 @@ object DisplayNode extends Loggable {
       displayTabSlots(jsId, sm) ::
       displayTabSounds(jsId, sm) ::
       displayTabStorages(jsId, sm) ::
-      displayTabVideos(jsId, sm) ::
+      displayTabVideos(jsId, sm) :: 
       Nil
     
       <div id={htmlId(jsId,"details_")} class="sInventory">{bind("server", content,
@@ -200,6 +201,8 @@ object DisplayNode extends Loggable {
     <li><a href={htmlId_#(jsId,"sd_fs_")}>File systems</a></li>
     <li><a href={htmlId_#(jsId,"sd_net_")}>Network interfaces</a></li>
     <li><a href={htmlId_#(jsId,"sd_soft_")}>Software</a></li>
+    <li><a href={htmlId_#(jsId,"sd_var_")}>Variable</a></li>
+    <li><a href={htmlId_#(jsId,"sd_process_")}>Process</a></li>
     </xml:group>
   }
 
@@ -210,7 +213,10 @@ object DisplayNode extends Loggable {
     val jsId = JsNodeId(sm.node.main.id,salt)
     displayTabFilesystems(jsId, sm) ++
     displayTabNetworks(jsId, sm) ++
-    displayTabSoftware(jsId)
+    displayTabVariable(jsId, sm) ++
+    displayTabProcess(jsId, sm) ++
+    displayTabSoftware(jsId) 
+    
   }
   
   /**
@@ -231,13 +237,34 @@ object DisplayNode extends Loggable {
          </div>
        </div>
        {showExtraContent(sm, salt)}
-       
-       <div id={htmlId(jsId,"node_summary_")}>
-         {showNodeDetails(sm, None, salt)}
-       </div>
+              <div id="node_summary_">
+         <div id={htmlId(jsId,"node_summary_")}>
+         {showNode(sm, false, "",None)}
+            </div>
+         </div>
     </div>
   }
   
+  
+   def showNode(sm:FullInventory, showExtraFields : Boolean = true, salt:String = "",creationDate:Option[DateTime]) : NodeSeq = {
+    val jsId = JsNodeId(sm.node.main.id,salt)
+    val mainTabDeclaration : List[NodeSeq] =
+      <li><a href={htmlId_#(jsId,"sd_general_")}>General</a></li> ::
+         <li><a href={htmlId_#(jsId,"sd_os_details_")}>OS Details</a></li> ::
+         <li><a href={htmlId_#(jsId,"sd_rudder_agents_")}>Rudder agents</a></li> ::
+      Nil
+    
+    val tabContent = 
+      displayTabGeneral(jsId, sm,creationDate) ::
+      displayTabOSDetails(jsId, sm) ::
+      displayTabAgents(jsId,sm) ::
+      Nil
+    
+      <div id={htmlId(jsId,"details_")} class="sInventory">{bind("server", content,
+        "tabsDefinition" -> <ul>{mainTabDeclaration}</ul>,
+        "grid_tabs" -> tabContent.flatten
+    )}</div> 
+  }
   // mimic the content of server_details/ShowNodeDetailsFromNode
   def showNodeDetails(sm:FullInventory, creationDate:Option[DateTime], salt:String = "") : NodeSeq = {
   
@@ -273,7 +300,7 @@ object DisplayNode extends Loggable {
             
       <h4 class="tablemargin">Rudder information</h4>
         <div class="tablepadding">
-          <b>Agent name:</b> {sm.node.agentNames.map(_.toString).mkString(";")}<br/>
+          <b>Agent name:</b> {sm.node.main.agents.map(_.name).mkString(";")}<br/>
           <b>Rudder ID:</b> {sm.node.main.id.value}<br/>
           <b>Date inventory last received:</b>  {sm.node.inventoryDate.map(DateFormaterService.getFormatedDate(_)).getOrElse("Unknown")}<br/>
           {creationDate.map { creation =>
@@ -284,7 +311,6 @@ object DisplayNode extends Loggable {
       <h4 class="tablemargin">Accounts</h4>
         <div class="tablepadding">
           <b>Administrator account:</b> {sm.node.main.rootUser}<br/>
-          <b>Local account(s):</b> {displayAccounts(sm.node)}<br/>
         </div>
     </fieldset>
   
@@ -309,9 +335,13 @@ object DisplayNode extends Loggable {
     }
   }
   
-  private def displayPublicKeys(node:NodeInventory) : NodeSeq = <b>Public Key(s): </b> ++ {if(node.publicKeys.isEmpty) {
+  private def displayPublicKeys(node:NodeInventory) : NodeSeq = <b>Public Key(s): 
+      </b> ++ {
+    if 
+    (node.main.agents.map(_.cfengineKey).toList.isEmpty) {
           Text("None")
-        } else <ul>{node.publicKeys.zipWithIndex.flatMap{ case (x,i) => (<b>{"[" + i + "] "}</b> ++ {Text(x.key.grouped(65).toList.mkString("\n"))})}}</ul> }
+        } 
+    else <ul>{node.main.agents.map(_.cfengineKey.get).toList.zipWithIndex.flatMap{ case (x,i) => (<b>{"[" + i + "] "}</b> ++ {Text(x.key.grouped(65).toList.mkString("\n"))})}}</ul> }
   
   private def displayNodeInventoryInfo(node:NodeInventory) : NodeSeq = {
     val details : NodeSeq = node.main.osDetails match {
@@ -334,23 +364,23 @@ object DisplayNode extends Loggable {
   }
   
   //show a comma separated list with description in tooltip 
-  private def displayPolicies(node:NodeInventory) : NodeSeq = {
+ /* private def displayPolicies(node:NodeInventory) : NodeSeq = {
     <b>Applied Directives: </b> ++ {Text{if(node.techniques.isEmpty) {
         "None"
       } else {
         node.techniques.mkString(", ")
       }}
     }
-  }
+  }*/
   
-  private def displayAccounts(node:NodeInventory) : NodeSeq = {
+ /* private def displayAccounts(node:NodeInventory) : NodeSeq = {
     Text{if(node.accounts.isEmpty) {
         "None"
       } else {
         node.accounts.sortWith(_ < _).mkString(", ")
       }
     }
-  }
+  }*/
 
   private def displayTabGrid[T](jsId:JsNodeId)(eltName:String, optSeq:Box[Seq[T]])(columns:List[(String, T => NodeSeq)]) = {
 
@@ -404,6 +434,29 @@ object DisplayNode extends Loggable {
         Nil
     }
   
+  
+    private def displayTabVariable(jsId:JsNodeId,sm:FullInventory) : NodeSeq = 
+    displayTabGrid(jsId)("var", Full(sm.node.environmentVariables)){
+        ("Name", {x:EnvironmentVariable => Text(x.name)}) :: 
+        ("Value", {x:EnvironmentVariable => Text(x.value.getOrElse("Unspecified"))}) :: 
+        Nil
+    }
+  
+    private def displayTabProcess(jsId:JsNodeId,sm:FullInventory) : NodeSeq = 
+    displayTabGrid(jsId)("process", Full(sm.node.processes)){
+        ("PID", {x:Process => Text(x.pid.toString())}) :: 
+        ("Command Name", { x:Process => 
+        if (x.commandName.get.size<30) 
+         ?(x.commandName)
+         else  Text("too long") }) :: 
+        ("% CPU", {x:Process => ?(x.cpuUsage.map(_.toString()))}) ::
+        ("% Memory", {x:Process => ?(x.memory.map(_.toString()))}) ::
+        ("User", {x:Process => ?(x.user)}) :: 
+        ("Virtual Memory", {x:Process => ?(x.virtualMemory.map(_.toString()))}) :: 
+        ("TTY", {x:Process => ?(x.tty)}) ::
+        ("Type", {x:Process => ?(x.started.map(_.toString()))}) ::
+        Nil
+    }
   private def displayTabFilesystems(jsId:JsNodeId,sm:FullInventory) : NodeSeq = 
     displayTabGrid(jsId)("fs", Full(sm.node.fileSystems)){
         ("Mount point", {x:FileSystem => Text(x.mountPoint)}) ::
@@ -413,7 +466,7 @@ object DisplayNode extends Loggable {
         ("File count", {x:FileSystem => ?(x.fileCount.map(_.toString))}) :: 
         Nil
     }
-    
+
   private def displayTabBios(jsId:JsNodeId,sm:FullInventory) : NodeSeq = 
     displayTabGrid(jsId)("bios", sm.machine.map(fm => fm.bios)){
         ("Name", {x:Bios => Text(x.name)}) ::
@@ -457,9 +510,14 @@ object DisplayNode extends Loggable {
     displayTabGrid(jsId)("processors", sm.machine.map(fm => fm.processors)){
         ("Name", {x:Processor => Text(x.name)}) ::
         ("Speed", {x:Processor => ?(x.speed.map(_.toString))}) :: 
-        ("Model", {x:Processor => ?(x.model)}) :: 
-        ("Family", {x:Processor => ?(x.family)}) :: 
+        ("Model", {x:Processor => ?(x.model.map(_.toString()))}) :: 
+        ("Family", {x:Processor => ?(x.family.map(_.toString()))}) :: 
+        ("Family Name", {x:Processor => ?(x.familyName)}) ::
         ("Manufacturer", {x:Processor => ?(x.manufacturer.map(_.name))}) :: 
+        ("Thread", {x:Processor => ?(x.thread.map(_.toString()))}) ::
+        ("Core", {x:Processor => ?(x.core.map(_.toString()))}) ::
+        ("CPUID", {x:Processor => ?(x.cpuid)}) ::
+        ("Architecture", {x:Processor => ?(x.arch)}) ::
         ("Stepping", {x:Processor => ?(x.stepping.map(_.toString))}) :: 
         ("Quantity", {x:Processor => Text(x.quantity.toString)}) :: 
         Nil
@@ -505,7 +563,48 @@ object DisplayNode extends Loggable {
         ( "Quantity" , {x:Video => Text(x.quantity.toString)}) :: 
         Nil
     }
-  
+    private def displayTabGeneral(jsId:JsNodeId,sm:FullInventory,creationDate:Option[DateTime]) : NodeSeq = 
+   { displayTabGrid(jsId)("general", Full(Seq(sm.node))){
+
+        ("Hostname", {m:NodeInventory => Text(sm.node.main.hostname)}) :: 
+              ("Machine Type", {m:NodeInventory => displayMachineType(sm.machine)}) :: 
+                    ("Total physical memory (RAM)", {m:NodeInventory => Text(sm.node.ram.map( _.toStringMo).getOrElse("-"))}) :: 
+                          ("swap space", {m:NodeInventory => Text(sm.node.swap.map( _.toStringMo).getOrElse("-"))}) :: 
+                                  ("Last reception Date", {m:NodeInventory => Text(sm.node.inventoryDate.map(DateFormaterService.getFormatedDate(_)).getOrElse("Unknown"))}) :: 
+                                   ("first accepted on", {m:NodeInventory => Text(creationDate.map(DateFormaterService.getFormatedDate(_)).getOrElse("Never"))}) :: 
+        Nil
+    }
+
+   }
+
+       
+    private def displayTabOSDetails(jsId:JsNodeId,sm:FullInventory) : NodeSeq = 
+   { displayTabGrid(jsId)("os_details", Full(Seq(sm.node))){
+
+        ("OS", {m:NodeInventory => Text(sm.node.main.osDetails.fullName)}) :: 
+              ("OS Type", {m:NodeInventory => Text(sm.node.main.osDetails.os.kernelName)}) :: 
+                    ("OS Name", {m:NodeInventory => Text(sm.node.main.osDetails.os.name)}) :: 
+                    ("OS Version", {m:NodeInventory => Text(sm.node.main.osDetails.version.value)}) :: 
+                    ("OS Service Pack", {m:NodeInventory => Text(sm.node.main.osDetails.servicePack.getOrElse("None"))}) :: 
+        Nil
+    }
+
+   } 
+    
+        private def displayTabAgents(jsId:JsNodeId,sm:FullInventory) : NodeSeq = 
+   { displayTabGrid(jsId)("rudder_agents", Full(sm.node.main.agents)){
+
+        ("Name", {ag:Agent => Text(ag.name)}) :: 
+          ("Policy server UUID", {ag:Agent => ?(ag.policyServerUUID.map(_.value))}) :: 
+            ("Policy server hostname", {ag:Agent => ?(ag.policyServerHostname)}) :: 
+                  ("Cfengine key", {ag:Agent => <pre>{ag.cfengineKey.map(_.key).get}</pre>}) :: 
+                        ("owner", {ag:Agent => ?(ag.owner)}) :: 
+        Nil
+    }
+
+   } 
+    
+    
   private[this] def showPopup(nodeId : NodeId) : JsCmd = {
     val popupHtml = 
     <div class="simplemodal-title">

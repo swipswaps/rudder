@@ -91,7 +91,7 @@ class NodeSummaryServiceImpl(
         , osType       = node.main.osDetails.os.kernelName
         , osName       = node.main.osDetails.os.name
         , osFullName   = node.main.osDetails.fullName
-        , ips          = node.serverIps.toList
+        , ips          = node.main.agents.map(_.policyServerHostname.get).toList
         , creationDate = dateTime
       )
     }    

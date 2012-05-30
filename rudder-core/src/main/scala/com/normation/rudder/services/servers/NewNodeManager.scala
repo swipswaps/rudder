@@ -642,7 +642,7 @@ class AcceptNodeRule(
    * add the server to the list of children of the policy server
    */
   private[this] def addNodeToPolicyServerGroup(sm:FullInventory,nodeId:NodeId, actor:EventActor) : Box[NodeId] = {
-    val hasPolicyServerNodeGroup = buildHasPolicyServerGroupId(sm.node.main.policyServerId) 
+    val hasPolicyServerNodeGroup = buildHasPolicyServerGroupId(sm.node.main.agents.first.policyServerUUID.get) 
     for {
       group <- groupRepo.getNodeGroup(hasPolicyServerNodeGroup) ?~! "Technical group with ID '%s' was not found".format(hasPolicyServerNodeGroup)
       updatedGroup = group.copy( serverList = group.serverList + nodeId )
@@ -660,7 +660,7 @@ class AcceptNodeRule(
   def rollback(sms:Seq[FullInventory], actor:EventActor) : Unit = {
     sms.foreach { sm => 
       (for {
-        group <- groupRepo.getNodeGroup(buildHasPolicyServerGroupId(sm.node.main.policyServerId)) ?~! "Can not find group with id: %s".format(sm.node.main.policyServerId)
+        group <- groupRepo.getNodeGroup(buildHasPolicyServerGroupId(sm.node.main.agents.first.policyServerUUID.get)) ?~! "Can not find group with id: %s".format(sm.node.main.agents.first.policyServerUUID.get)
         updatedGroup = group.copy( serverList = group.serverList.filter(x => x != sm.node.main.id ) )
         msg = Some("Automatic update of system group due to rollback of acceptation of node "+ sm.node.main.id.value)
         saved<- groupRepo.update(updatedGroup, actor, msg)?~! "Error when trying to update dynamic group %s with member %s".format(updatedGroup.id,sm.node.main.id.value)
