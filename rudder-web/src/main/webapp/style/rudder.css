@@ -323,6 +323,11 @@ Tableau
 .tablewidth{
   width:100%;
 }
+
+.tablelayout{
+  table-layout:fixed;
+  word-wrap: break-word;
+}
 .tablepadding{
   padding-left:15px;
   padding-top:5px;

@@ -113,6 +113,7 @@ object DisplayNode extends Loggable {
   def jsInit(nodeId:NodeId, softIds:Seq[SoftwareUuid], salt:String="", tabContainer : Option[String] = None):JsCmd = {
     val jsId           = JsNodeId(nodeId,salt)
     val detailsId      = htmlId(jsId,"details_")
+        val summaryId      = htmlId(jsId,"summary_")
     val softGridDataId = htmlId(jsId,"soft_grid_data_")
     val softGridId     = htmlId(jsId,"soft_grid_")
     val softPanelId    = htmlId(jsId,"sd_soft_")
@@ -121,6 +122,7 @@ object DisplayNode extends Loggable {
       
     JsRaw("var "+softGridDataId +"= null") & 
     OnLoad(
+              JsRaw("$('#"+summaryId+"').tabs()") & 
       JsRaw("$('#"+detailsId+"').tabs()") & 
       { eltIds.map { i => 
           JsRaw("""$('#%s').dataTable({"bJQueryUI": false,"bFilter": false,"asStripClasses": [ 'color1', 'color2' ],"bPaginate": false, "bInfo":false});
@@ -236,12 +238,13 @@ object DisplayNode extends Loggable {
            {show(sm, false, "")}
          </div>
        </div>
-       {showExtraContent(sm, salt)}
-              <div id="node_summary_">
+         <div id="node_summary_">
          <div id={htmlId(jsId,"node_summary_")}>
          {showNode(sm, false, "",None)}
             </div>
          </div>
+       {showExtraContent(sm, salt)}
+     
     </div>
   }
   
@@ -260,7 +263,7 @@ object DisplayNode extends Loggable {
       displayTabAgents(jsId,sm) ::
       Nil
     
-      <div id={htmlId(jsId,"details_")} class="sInventory">{bind("server", content,
+      <div id={htmlId(jsId,"summary_")} class="sInventory">{bind("server", content,
         "tabsDefinition" -> <ul>{mainTabDeclaration}</ul>,
         "grid_tabs" -> tabContent.flatten
     )}</div> 
@@ -390,14 +393,14 @@ object DisplayNode extends Loggable {
         case Failure(m,_,_) => <span class="error">Error when trying to fetch file systems. Reported message: {m}</span>
         case Full(seq) if (seq.isEmpty && eltName != "soft") => <span>No matching components detected on this node</span>
         case Full(seq) => 
-          <table cellspacing="0" id={htmlId(jsId,eltName + "_grid_")} class="tablewidth">
+          <table cellspacing="0" id={htmlId(jsId,eltName + "_grid_")} class="tablelayout tablewidth">
           <thead>
             <tr class="head">{
               columns.map {h => <th>{h._1}</th> }.toSeq
             }</tr>
           </thead>
           <tbody>{ seq.flatMap { x =>
-            <tr>{ columns.flatMap{ case(header,renderLine) =>  <td>{renderLine(x)}</td> } }</tr>
+            <tr  >{ columns.flatMap{ case(header,renderLine) =>  <td>{renderLine(x)}</td> } }</tr>
           } }</tbody>
           </table>
       }
@@ -441,20 +444,17 @@ object DisplayNode extends Loggable {
         ("Value", {x:EnvironmentVariable => Text(x.value.getOrElse("Unspecified"))}) :: 
         Nil
     }
-  
+
     private def displayTabProcess(jsId:JsNodeId,sm:FullInventory) : NodeSeq = 
     displayTabGrid(jsId)("process", Full(sm.node.processes)){
+        ("User", {x:Process => ?(x.user)}) :: 
         ("PID", {x:Process => Text(x.pid.toString())}) :: 
-        ("Command Name", { x:Process => 
-        if (x.commandName.get.size<30) 
-         ?(x.commandName)
-         else  Text("too long") }) :: 
         ("% CPU", {x:Process => ?(x.cpuUsage.map(_.toString()))}) ::
         ("% Memory", {x:Process => ?(x.memory.map(_.toString()))}) ::
-        ("User", {x:Process => ?(x.user)}) :: 
         ("Virtual Memory", {x:Process => ?(x.virtualMemory.map(_.toString()))}) :: 
         ("TTY", {x:Process => ?(x.tty)}) ::
-        ("Type", {x:Process => ?(x.started.map(_.toString()))}) ::
+        ("Start", {x:Process => ?(x.started.map(_.toString()))}) ::
+        ("Command", { x:Process => ?(x.commandName) })  ::
         Nil
     }
   private def displayTabFilesystems(jsId:JsNodeId,sm:FullInventory) : NodeSeq = 
@@ -597,7 +597,7 @@ object DisplayNode extends Loggable {
         ("Name", {ag:Agent => Text(ag.name)}) :: 
           ("Policy server UUID", {ag:Agent => ?(ag.policyServerUUID.map(_.value))}) :: 
             ("Policy server hostname", {ag:Agent => ?(ag.policyServerHostname)}) :: 
-                  ("Cfengine key", {ag:Agent => <pre>{ag.cfengineKey.map(_.key).get}</pre>}) :: 
+                  ("Cfengine key", {ag:Agent => ?(ag.cfengineKey.map(_.key))}) :: 
                         ("owner", {ag:Agent => ?(ag.owner)}) :: 
         Nil
     }
