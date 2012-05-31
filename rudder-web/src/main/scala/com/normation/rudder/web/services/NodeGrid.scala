@@ -199,7 +199,7 @@ class NodeGrid(getNodeAndMachine:LDAPFullInventoryRepository) extends Loggable {
   
   def display(servers:Seq[Srv], tableId:String, columns:Seq[(Node,Srv => NodeSeq)]=Seq(), aoColumns:String ="") : NodeSeq = {
     //bind the table
-    <table id={tableId} cellspacing="0">{
+    <table id={tableId} class="tablelayout" cellspacing="0">{
     bind("servergrid",tableTemplate,
       "header" -> (columns flatMap { c => <th>{c._1}<span/></th> }),
       "lines" -> ( servers.flatMap { case s@Srv(id,status, hostname,ostype,osname,osFullName,ips,creationDate) =>

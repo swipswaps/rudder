@@ -100,7 +100,7 @@ object DisplayNode extends Loggable {
         Str(x.name.getOrElse("")),
         Str(x.version.map(_.value).getOrElse("")),
         Str(x.description.getOrElse(""))
-      )}:_*) ) & JsRaw("""$('#%s').dataTable({"aaData":%s,"bJQueryUI": false, "bPaginate": true, "bLengthChange": false, "bAutoWidth": false, "aoColumns": [ {"sWidth": "200px"},{"sWidth": "150px"},{"sWidth": "350px"}] });moveFilterAndPaginateArea('#%s');""".format(gridId,gridDataId,gridId))
+      )}:_*) ) & JsRaw("""$('#%s').dataTable({"aaData":%s,"bJQueryUI": false, "bPaginate": true, "asStripClasses": [ 'color1', 'color2' ],"bLengthChange": false, "bAutoWidth": false, "aoColumns": [ {"sWidth": "200px"},{"sWidth": "150px"},{"sWidth": "350px"}] });moveFilterAndPaginateArea('#%s');""".format(gridId,gridDataId,gridId))
     ) match {
       case Empty => Alert("No software found for that server")
       case Failure(m,_,_) => Alert("Error when trying to fetch software. Reported message: "+m)
@@ -110,34 +110,38 @@ object DisplayNode extends Loggable {
   
   def head() = chooseTemplate("serverdetails","head",template)
   
-  def jsInit(nodeId:NodeId, softIds:Seq[SoftwareUuid], salt:String="", tabContainer : Option[String] = None):JsCmd = {
-    val jsId           = JsNodeId(nodeId,salt)
-    val detailsId      = htmlId(jsId,"details_")
-        val summaryId      = htmlId(jsId,"summary_")
+def jsInit(nodeId:NodeId, softIds:Seq[SoftwareUuid], salt:String="", tabContainer : Option[String] = None):JsCmd = {
+    val jsId = JsNodeId(nodeId,salt)
+    val detailsId = htmlId(jsId,"details_")
     val softGridDataId = htmlId(jsId,"soft_grid_data_")
-    val softGridId     = htmlId(jsId,"soft_grid_")
-    val softPanelId    = htmlId(jsId,"sd_soft_")
-    val eltIds         = List("rudder_agents", "os_details","process",  "var", "general", "fs", "net","bios", "controllers", "memories", "ports", "processors", "slots", "sounds", "storages", "videos").
+    val softGridId = htmlId(jsId,"soft_grid_")
+    val softPanelId = htmlId(jsId,"sd_soft_")
+    var eltIdswidth = List( ("process",List("50","50","50","60","50","50","100","850")),("var",List("200","800"))).map(x => (htmlId(jsId, x._1+ "_grid_"),x._2.map("""{"sWidth": "%spx"}""".format(_))))
+    val eltIds = List( "vm", "fs", "net","bios", "controllers", "memories", "ports", "processors", "slots", "sounds", "storages", "videos").
                            map(x => htmlId(jsId, x+ "_grid_"))
       
-    JsRaw("var "+softGridDataId +"= null") & 
+    JsRaw("var "+softGridDataId +"= null") &
     OnLoad(
-              JsRaw("$('#"+summaryId+"').tabs()") & 
-      JsRaw("$('#"+detailsId+"').tabs()") & 
-      { eltIds.map { i => 
-          JsRaw("""$('#%s').dataTable({"bJQueryUI": false,"bFilter": false,"asStripClasses": [ 'color1', 'color2' ],"bPaginate": false, "bInfo":false});
-              | """.stripMargin('|').format(i,i)):JsCmd
+      JsRaw("$('#"+detailsId+"').tabs()") &
+      { eltIds.map { i =>
+          JsRaw("""$('#%s').dataTable({"bJQueryUI": false,"bFilter": false,"asStripClasses": [ 'color1', 'color2' ],"bPaginate": false, "bAutoWidth": false, "bInfo":false});moveFilterAndPaginateArea('#%s');
+| """.stripMargin('|').format(i,i)):JsCmd
         }.reduceLeft( (i,acc) => acc & i )
+      } &
+      { eltIdswidth.map { i =>
+          JsRaw("""$('#%s').dataTable({"bJQueryUI": false,"bFilter": true,"asStripClasses": [ 'color1', 'color2' ],"bPaginate": true,"aoColumns":  %s ,"bLengthChange": false, "bAutoWidth": false, "bInfo":true});moveFilterAndPaginateArea('#%s');
+| """.stripMargin('|').format(i._1,i._2.mkString("[",",","]"),i._1)):JsCmd
+        }
       } &
       JsRaw("roundTabs()") &
       // for the software tab, we check for the panel id, and the firstChild id
       // if the firstChild.id == softGridId, then it hasn't been loaded, otherwise it is softGridId_wrapper
       JsRaw("""
-          | $("#%s").bind( "tabsshow", function(event, ui) {
-          |   if(ui.panel.id== '%s' && ui.panel.firstChild.id == '%s') { %s; }
-          | });
-          """.stripMargin('|').format(tabContainer.getOrElse(detailsId),
-            softPanelId,softGridId, 
+| $("#%s").bind( "tabsshow", function(event, ui) {
+| if(ui.panel.id== '%s' && ui.panel.firstChild.id == '%s') { %s; }
+| });
+""".stripMargin('|').format(tabContainer.getOrElse(detailsId),
+            softPanelId,softGridId,
             SHtml.ajaxCall(JsRaw("'"+nodeId.value+"'"), loadSoftware(jsId, softIds) )._2.toJsCmd)
       )
     )
@@ -203,8 +207,9 @@ object DisplayNode extends Loggable {
     <li><a href={htmlId_#(jsId,"sd_fs_")}>File systems</a></li>
     <li><a href={htmlId_#(jsId,"sd_net_")}>Network interfaces</a></li>
     <li><a href={htmlId_#(jsId,"sd_soft_")}>Software</a></li>
-    <li><a href={htmlId_#(jsId,"sd_var_")}>Variable</a></li>
+    <li><a href={htmlId_#(jsId,"sd_var_")}>Environnement variable</a></li>
     <li><a href={htmlId_#(jsId,"sd_process_")}>Process</a></li>
+    <li><a href={htmlId_#(jsId,"sd_vm_")}>VM</a></li>
     </xml:group>
   }
 
@@ -217,6 +222,7 @@ object DisplayNode extends Loggable {
     displayTabNetworks(jsId, sm) ++
     displayTabVariable(jsId, sm) ++
     displayTabProcess(jsId, sm) ++
+    displayTabVM(jsId, sm) ++
     displayTabSoftware(jsId) 
     
   }
@@ -238,13 +244,11 @@ object DisplayNode extends Loggable {
            {show(sm, false, "")}
          </div>
        </div>
-         <div id="node_summary_">
-         <div id={htmlId(jsId,"node_summary_")}>
-         {showNode(sm, false, "",None)}
-            </div>
-         </div>
        {showExtraContent(sm, salt)}
-     
+       
+       <div id={htmlId(jsId,"node_summary_")}>
+         {showNodeDetails(sm, None, salt)}
+       </div>
     </div>
   }
   
@@ -290,6 +294,10 @@ object DisplayNode extends Loggable {
           <b>Machine type:</b> {displayMachineType(sm.machine)}<br/>
           <b>Total physical memory (RAM):</b> {sm.node.ram.map( _.toStringMo).getOrElse("-")}<br/>
           <b>Total swap space:</b> {sm.node.swap.map( _.toStringMo).getOrElse("-")}<br/>
+          <b>Date inventory last received:</b>  {sm.node.inventoryDate.map(DateFormaterService.getFormatedDate(_)).getOrElse("Unknown")}<br/>
+          {creationDate.map { creation =>
+            <xml:group><b>Date first accepted in Rudder:</b> {DateFormaterService.getFormatedDate(creation)}<br/></xml:group>
+          }.getOrElse(NodeSeq.Empty) }
         </div>
             
       <h4 class="tablemargin">Operating system details</h4>
@@ -303,12 +311,14 @@ object DisplayNode extends Loggable {
             
       <h4 class="tablemargin">Rudder information</h4>
         <div class="tablepadding">
-          <b>Agent name:</b> {sm.node.main.agents.map(_.name).mkString(";")}<br/>
           <b>Rudder ID:</b> {sm.node.main.id.value}<br/>
-          <b>Date inventory last received:</b>  {sm.node.inventoryDate.map(DateFormaterService.getFormatedDate(_)).getOrElse("Unknown")}<br/>
-          {creationDate.map { creation =>
-            <xml:group><b>Date first accepted in Rudder:</b> {DateFormaterService.getFormatedDate(creation)}<br/></xml:group>
-          }.getOrElse(NodeSeq.Empty) }
+          {sm.node.main.agents.map{agent => 
+            <div>
+            <b>Agent name:</b> {agent.name}<br/>
+            <b>Policy server UUID:</b> {agent.policyServerUUID.map(_.value).getOrElse("Unkown")}<br/>
+            <b>Policy server hostname:</b> {agent.policyServerHostname.getOrElse("Unkown")}<br/>
+            <b>Owner:</b> {agent.owner.getOrElse("Unkown")}<br/>
+          </div> } }
         </div>
         
       <h4 class="tablemargin">Accounts</h4>
@@ -457,6 +467,18 @@ object DisplayNode extends Loggable {
         ("Command", { x:Process => ?(x.commandName) })  ::
         Nil
     }
+    private def displayTabVM(jsId:JsNodeId,sm:FullInventory) : NodeSeq = 
+    displayTabGrid(jsId)("vm", Full(sm.node.vms)){
+        ("Name", {x:VirtualMachine => ?(x.name)}) ::
+        ("Type", {x:VirtualMachine => ?(x.vmtype)}) ::
+        ("SubSystem", {x:VirtualMachine => ?(x.subsystem)}) ::
+        ("Uuid", {x:VirtualMachine => Text(x.uuid.value)}) :: 
+        ("Status", {x:VirtualMachine => ?(x.status)}) ::
+        ("Owner", {x:VirtualMachine => ?(x.owner)}) ::        
+        ("Cpu", {x:VirtualMachine => ?(x.vcpu.map(_.toString()))}) ::
+        ("Memory", { x:VirtualMachine => ?(x.memory) })  ::
+        Nil
+    }
   private def displayTabFilesystems(jsId:JsNodeId,sm:FullInventory) : NodeSeq = 
     displayTabGrid(jsId)("fs", Full(sm.node.fileSystems)){
         ("Mount point", {x:FileSystem => Text(x.mountPoint)}) ::
@@ -597,7 +619,6 @@ object DisplayNode extends Loggable {
         ("Name", {ag:Agent => Text(ag.name)}) :: 
           ("Policy server UUID", {ag:Agent => ?(ag.policyServerUUID.map(_.value))}) :: 
             ("Policy server hostname", {ag:Agent => ?(ag.policyServerHostname)}) :: 
-                  ("Cfengine key", {ag:Agent => ?(ag.cfengineKey.map(_.key))}) :: 
                         ("owner", {ag:Agent => ?(ag.owner)}) :: 
         Nil
     }
