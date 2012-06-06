@@ -92,7 +92,7 @@ class TestQueryProcessor extends Loggable {
   
   val ditQueryData = new DitQueryData(DIT)
   
-  val ldapMapper = new LDAPEntityMapper(null, nodeDit, DIT, null)
+  val ldapMapper = new LDAPEntityMapper(null, nodeDit, DIT, null, null)
   val internalLDAPQueryProcessor = new InternalLDAPQueryProcessor(ldap,DIT,ditQueryData,ldapMapper)
     
   val queryProcessor = new AccepetedNodesLDAPQueryProcessor(

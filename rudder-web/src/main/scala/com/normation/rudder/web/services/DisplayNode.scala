@@ -100,7 +100,7 @@ object DisplayNode extends Loggable {
         Str(x.name.getOrElse("")),
         Str(x.version.map(_.value).getOrElse("")),
         Str(x.description.getOrElse(""))
-      )}:_*) ) & JsRaw("""$('#%s').dataTable({"aaData":%s,"bJQueryUI": false, "bPaginate": true, "asStripClasses": [ 'color1', 'color2' ],"bLengthChange": false, "bAutoWidth": false, "aoColumns": [ {"sWidth": "200px"},{"sWidth": "150px"},{"sWidth": "350px"}] });moveFilterAndPaginateArea('#%s');""".format(gridId,gridDataId,gridId))
+      )}:_*) ) & JsRaw("""$('#%s').dataTable({"aaData":%s,"bJQueryUI": false, "bRetrieve": true,"bPaginate": true, "asStripClasses": [ 'color1', 'color2' ],"bLengthChange": false, "bAutoWidth": false, "aoColumns": [ {"sWidth": "200px"},{"sWidth": "150px"},{"sWidth": "350px"}] });moveFilterAndPaginateArea('#%s');""".format(gridId,gridDataId,gridId))
     ) match {
       case Empty => Alert("No software found for that server")
       case Failure(m,_,_) => Alert("Error when trying to fetch software. Reported message: "+m)
@@ -124,12 +124,12 @@ def jsInit(nodeId:NodeId, softIds:Seq[SoftwareUuid], salt:String="", tabContaine
     OnLoad(
       JsRaw("$('#"+detailsId+"').tabs()") &
       { eltIds.map { i =>
-          JsRaw("""$('#%s').dataTable({"bJQueryUI": false,"bFilter": false,"asStripClasses": [ 'color1', 'color2' ],"bPaginate": false, "bAutoWidth": false, "bInfo":false});moveFilterAndPaginateArea('#%s');
+          JsRaw("""$('#%s').dataTable({"bJQueryUI": false,"bRetrieve": true,"bFilter": false,"asStripClasses": [ 'color1', 'color2' ],"bPaginate": false, "bAutoWidth": false, "bInfo":false});moveFilterAndPaginateArea('#%s');
 | """.stripMargin('|').format(i,i)):JsCmd
         }.reduceLeft( (i,acc) => acc & i )
       } &
       { eltIdswidth.map { i =>
-          JsRaw("""$('#%s').dataTable({"bJQueryUI": false,"bFilter": true,"asStripClasses": [ 'color1', 'color2' ],"bPaginate": true,"aoColumns":  %s ,"bLengthChange": false, "bAutoWidth": false, "bInfo":true});moveFilterAndPaginateArea('#%s');
+          JsRaw("""$('#%s').dataTable({"bJQueryUI": false,"bRetrieve": true,"bFilter": true,"asStripClasses": [ 'color1', 'color2' ],"bPaginate": true,"aoColumns":  %s ,"bLengthChange": false, "bAutoWidth": false, "bInfo":true});moveFilterAndPaginateArea('#%s');
 | """.stripMargin('|').format(i._1,i._2.mkString("[",",","]"),i._1)):JsCmd
         }
       } &
@@ -253,25 +253,7 @@ def jsInit(nodeId:NodeId, softIds:Seq[SoftwareUuid], salt:String="", tabContaine
   }
   
   
-   def showNode(sm:FullInventory, showExtraFields : Boolean = true, salt:String = "",creationDate:Option[DateTime]) : NodeSeq = {
-    val jsId = JsNodeId(sm.node.main.id,salt)
-    val mainTabDeclaration : List[NodeSeq] =
-      <li><a href={htmlId_#(jsId,"sd_general_")}>General</a></li> ::
-         <li><a href={htmlId_#(jsId,"sd_os_details_")}>OS Details</a></li> ::
-         <li><a href={htmlId_#(jsId,"sd_rudder_agents_")}>Rudder agents</a></li> ::
-      Nil
-    
-    val tabContent = 
-      displayTabGeneral(jsId, sm,creationDate) ::
-      displayTabOSDetails(jsId, sm) ::
-      displayTabAgents(jsId,sm) ::
-      Nil
-    
-      <div id={htmlId(jsId,"summary_")} class="sInventory">{bind("server", content,
-        "tabsDefinition" -> <ul>{mainTabDeclaration}</ul>,
-        "grid_tabs" -> tabContent.flatten
-    )}</div> 
-  }
+ 
   // mimic the content of server_details/ShowNodeDetailsFromNode
   def showNodeDetails(sm:FullInventory, creationDate:Option[DateTime], salt:String = "") : NodeSeq = {
   
@@ -314,7 +296,7 @@ def jsInit(nodeId:NodeId, softIds:Seq[SoftwareUuid], salt:String="", tabContaine
           <b>Rudder ID:</b> {sm.node.main.id.value}<br/>
           {sm.node.main.agents.map{agent => 
             <div>
-            <b>Agent name:</b> {agent.name}<br/>
+            <b>Agent name:</b> {agent.name.getOrElse("Invalid agent")}<br/>
             <b>Policy server UUID:</b> {agent.policyServerUUID.map(_.value).getOrElse("Unkown")}<br/>
             <b>Policy server hostname:</b> {agent.policyServerHostname.getOrElse("Unkown")}<br/>
             <b>Owner:</b> {agent.owner.getOrElse("Unkown")}<br/>
@@ -613,17 +595,7 @@ def jsInit(nodeId:NodeId, softIds:Seq[SoftwareUuid], salt:String="", tabContaine
 
    } 
     
-        private def displayTabAgents(jsId:JsNodeId,sm:FullInventory) : NodeSeq = 
-   { displayTabGrid(jsId)("rudder_agents", Full(sm.node.main.agents)){
 
-        ("Name", {ag:Agent => Text(ag.name)}) :: 
-          ("Policy server UUID", {ag:Agent => ?(ag.policyServerUUID.map(_.value))}) :: 
-            ("Policy server hostname", {ag:Agent => ?(ag.policyServerHostname)}) :: 
-                        ("owner", {ag:Agent => ?(ag.owner)}) :: 
-        Nil
-    }
-
-   } 
     
     
   private[this] def showPopup(nodeId : NodeId) : JsCmd = {

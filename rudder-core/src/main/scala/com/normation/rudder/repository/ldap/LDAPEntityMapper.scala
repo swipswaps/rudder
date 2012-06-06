@@ -62,6 +62,7 @@ import scala.xml.{Text,NodeSeq}
 import com.normation.exceptions.{BusinessException,TechnicalException}
 import com.normation.rudder.services.policies.VariableBuilderService
 import net.liftweb.json.JsonAST.JObject
+import com.normation.inventory.ldap.core.InventoryMapper
 
 
 
@@ -74,6 +75,7 @@ class LDAPEntityMapper(
   , nodeDit        : NodeDit
   , inventoryDit   : InventoryDit
   , cmdbQueryParser: CmdbQueryParser
+  , inventorymapper: InventoryMapper
 ) extends Loggable {
   
   
@@ -118,41 +120,32 @@ class LDAPEntityMapper(
    * @param inventoryEntry
    * @return
    */
-  def convertEntriesToNodeInfos(nodeEntry:LDAPEntry, inventoryEntry:LDAPEntry) : Box[NodeInfo] = {
+  def convertEntriesToNodeInfos(nodeEntry:LDAPEntry, inventorytree:LDAPTree) : Box[NodeInfo] = {
     //why not using InventoryMapper ? Some required things for node are not 
     // wanted here ?
-    
+	 val inventorybox = inventorymapper.nodeFromTree(inventorytree)
     for {
       checkIsANode <- if(nodeEntry.isA(OC_RUDDER_NODE)) Full("ok") else Failure("Bad object class, need %s and found %s".format(OC_RUDDER_NODE,nodeEntry.valuesFor(A_OC)))
-      checkIsANode <- if(inventoryEntry.isA(OC_NODE)) Full("Ok") else Failure("Bad object class, need %s and found %s".format(OC_NODE,inventoryEntry.valuesFor(A_OC)))
-      checkSameID <- 
-        if(nodeEntry(A_NODE_UUID).isDefined && nodeEntry(A_NODE_UUID) ==  inventoryEntry(A_NODE_UUID)) Full("Ok")
-        else Failure("Mismatch id for the node %s and the inventory %s".format(nodeEntry(A_NODE_UUID), inventoryEntry(A_NODE_UUID)))
-      id <- nodeDit.NODES.NODE.idFromDn(nodeEntry.dn) ?~! "Bad DN found for a Node: %s".format(nodeEntry.dn)
-      // Compute the parent policy Id
-      policyServerId <- inventoryEntry.valuesFor(A_POLICY_SERVER_UUID).toList match {
-        case Nil => Failure("No policy servers for a Node: %s".format(nodeEntry.dn))
-        case x :: Nil => Full(x)
-        case _ => Failure("Too many policy servers for a Node: %s".format(nodeEntry.dn))
+      checkIsANode <- inventorybox match {case Full(_) => Full("Ok") 
+      case _ => Failure("Bad object class, need %s and found %s".format(OC_NODE,inventorytree.root.valuesFor(A_OC)))
       }
-      agentsName <- sequence(inventoryEntry.valuesFor(A_AGENTS_NAME).toSeq) { x =>
-                        AgentType.fromValue(x) ?~! "Unknow value for agent type: '%s'. Authorized values are: %s".format(x, AgentType.allValues.mkString(", "))
-                     }
+      inventory <- inventorybox
+      checkSameID <- 
+        if(nodeEntry(A_NODE_UUID).isDefined && nodeEntry(A_NODE_UUID) == inventory.main.id.value ) Full("Ok")
+        else Failure("Mismatch id for the node %s and the inventory %s".format(nodeEntry(A_NODE_UUID), inventory.main.id.value))
+                     
       date <- nodeEntry.getAsGTime(A_OBJECT_CREATION_DATE) ?~! "Can not find mandatory attribute '%s' in entry".format(A_OBJECT_CREATION_DATE)
     } yield {
       // fetch the inventory datetime of the object
-      val dateTime = inventoryEntry.getAsGTime(A_INVENTORY_DATE) match {
-        case None => DateTime.now() 
-        case Some(date) => date.dateTime 
-      }
+
   
       NodeInfo(
-          id,
+          inventory.main.id,
           nodeEntry(A_NAME).getOrElse(""),
           nodeEntry(A_DESCRIPTION).getOrElse(""),
-          inventoryEntry(A_HOSTNAME).getOrElse(""),
+          inventory.main.hostname,
           //OsType.osTypeFromObjectClasses(inventoryEntry.valuesFor(A_OC)).map(_.toString).getOrElse(""),
-          inventoryEntry(A_OS_FULL_NAME).getOrElse(""),
+          inventory.main.osDetails.fullName,
           inventoryEntry.valuesFor(A_LIST_OF_IP).toList, 
           dateTime,
           inventoryEntry(A_PKEYS).getOrElse(""),

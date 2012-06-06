@@ -251,7 +251,7 @@ class AppConfig extends Loggable {
   def variableBuilderService: VariableBuilderService = new VariableBuilderServiceImpl()
 
   @Bean
-  def ldapEntityMapper = new LDAPEntityMapper(rudderDit, nodeDit, acceptedNodesDit, queryParser)
+  def ldapEntityMapper = new LDAPEntityMapper(rudderDit, nodeDit, acceptedNodesDit, queryParser, inventoryMapper)
 
   @Bean
   def ldapNodeConfigurationMapper = new LDAPNodeConfigurationMapper(rudderDit, acceptedNodesDit, systemVariableSpecService, techniqueRepository, variableBuilderService, ldap)

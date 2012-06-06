@@ -129,7 +129,7 @@ class NodeInfoServiceImpl(
         if (node.isA(OC_POLICY_SERVER_NODE)) ldapMapper.convertEntryToPolicyServerNodeInfo(node)
         else {
           for {
-            server <- con.get(inventoryDit.NODES.NODE.dn(nodeId.value), nodeInfoAttributes:_*)  ?~! "Node info with ID '%s' was not found".format(nodeId.value)
+            server <- con.getTree(inventoryDit.NODES.NODE.dn(nodeId.value))  ?~! "Node info with ID '%s' was not found".format(nodeId.value)
             nodeInfo <- ldapMapper.convertEntriesToNodeInfos(node, server)
           } yield {
             nodeInfo

@@ -169,6 +169,7 @@ trait QuickSearchServiceSpec extends Specification with Loggable {
     , nodeDit         = nodeDit
     , inventoryDit    = inventoryDit
     , cmdbQueryParser = null
+    , inventorymapper = null
   )
 
   //the actual service to test
