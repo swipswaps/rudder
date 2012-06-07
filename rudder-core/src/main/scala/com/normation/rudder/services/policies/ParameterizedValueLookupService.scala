@@ -246,7 +246,7 @@ trait ParameterizedValueLookupService_lookupNodeParameterization extends Paramet
       case NodeParametrization(ParamNodeId) => Full(nodeInfo.id.value)
       case NodeParametrization(ParamNodeHostname) => Full(nodeInfo.hostname)
       case NodeParametrization(ParamNodeAdmin) => Full(nodeInfo.localAdministratorAccountName)
-      case NodeParametrization(ParamNodePsId) => Full(nodeInfo.policyServerId.value)
+      case NodeParametrization(ParamNodePsId) => Full(nodeInfo.agents.first.policyServerUUID.get.value)
       case NodeParametrization(ParamNodePsHostname) => policyServerInfo.map( _.hostname)
       case NodeParametrization(ParamNodePsAdmin) => policyServerInfo.map( _.localAdministratorAccountName)
       case NodeParametrization(BadParametrization(value)) => Failure("Unknow parameterized value: ${%s}".format(value))
@@ -261,7 +261,7 @@ trait ParameterizedValueLookupService_lookupNodeParameterization extends Paramet
       variables <- sequence(variables) { v =>
         for {
           values <- sequence(v.values) { value =>
-            lookupNodeVariable(nodeInfo, nodeInfoService.getPolicyServerNodeInfo(nodeInfo.policyServerId), value)
+            lookupNodeVariable(nodeInfo, nodeInfoService.getPolicyServerNodeInfo(nodeInfo.agents.first.policyServerUUID.get), value)
           }
         } yield Variable.matchCopy(v, values)
       }

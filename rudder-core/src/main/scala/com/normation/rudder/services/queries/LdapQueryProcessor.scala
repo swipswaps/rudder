@@ -57,6 +57,7 @@ import net.liftweb.common.EmptyBox
 
 
 
+
 /*
  * We have two type of filters:
  * * pure LDAP filters that can be directly translated to LDAP ones
@@ -108,13 +109,14 @@ object DefaultRequestLimits extends RequestLimits(10,1000,10,1000)
  */
 class AccepetedNodesLDAPQueryProcessor(
     nodeDit:NodeDit,
+    inventoryDit:InventoryDit,
     processor:InternalLDAPQueryProcessor
 ) extends QueryProcessor with Loggable {
 
   
   private[this] case class QueryResult(
     nodeEntry:LDAPEntry,
-    inventoryEntry:LDAPEntry
+    inventoryEntry:LDAPTree
   ) extends HashcodeCaching 
 
   /**
@@ -139,7 +141,7 @@ class AccepetedNodesLDAPQueryProcessor(
         con <- processor.ldap
         nodeEntry <- con.get(nodeDit.NODES.NODE.dn(rdn), Seq(SearchRequest.ALL_USER_ATTRIBUTES, A_OBJECT_CREATION_DATE):_*)
       } yield {
-        QueryResult(nodeEntry,inventoryEntry)
+        QueryResult(nodeEntry,con.getTree(inventoryDit.NODES.NODE.dn(rdn)).get)
       }
     }
   }
@@ -153,7 +155,7 @@ class AccepetedNodesLDAPQueryProcessor(
           case Full(nodeInfo) => Seq(nodeInfo)
           case e:EmptyBox => 
             logger.error((e ?~! "Ignoring entry in result set").messageChain)
-            Seq()          
+            Seq[NodeInfo]()          
         }
     } }
   }

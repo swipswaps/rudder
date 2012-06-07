@@ -547,7 +547,7 @@ class AppConfig extends Loggable {
   //query processor for accepted nodes
   @Bean
   def queryProcessor = new AccepetedNodesLDAPQueryProcessor(
-    nodeDit,
+    nodeDit,acceptedNodesDit,
     new InternalLDAPQueryProcessor(ldap, acceptedNodesDit, ditQueryData, ldapEntityMapper))
 
   //onoy a LDAP query checker for nodes in pending

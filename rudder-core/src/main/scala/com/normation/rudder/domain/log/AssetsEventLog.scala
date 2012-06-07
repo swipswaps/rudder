@@ -171,11 +171,11 @@ object NodeEventLog {
         <hostname>{node.hostname}</hostname>
         <description>{node.description}</description>
         <os>{node.os}</os>
-        <ips>{node.ips.map(ip => <ip>{ip}</ip>)}</ips>
+      {/*  <ips>{node.ips.map(ip => <ip>{ip}</ip>)}</ips>*/}
         <inventoryDate>{node.inventoryDate}</inventoryDate>        
-        <publicKey>{node.publicKey}</publicKey>
-        <agentsName>{node.agentsName.map(agentName => <agentName>{agentName}</agentName>)}</agentsName>        
-        <policyServerId>{node.policyServerId}</policyServerId>
+        <publicKey>{node.agents.first.cfengineKey}</publicKey>
+        <agentsName>{node.agents.map(agentName => <agentName>{agentName.name}</agentName>)}</agentsName>        
+        <policyServerId>{node.agents.first.policyServerUUID.get.value}</policyServerId>
         <localAdministratorAccountName>{node.localAdministratorAccountName}</localAdministratorAccountName>
         <creationDate>{node.creationDate}</creationDate>
         <isBroken>{node.isBroken}</isBroken>

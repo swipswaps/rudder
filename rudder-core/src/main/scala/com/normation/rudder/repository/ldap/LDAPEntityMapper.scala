@@ -63,6 +63,8 @@ import com.normation.exceptions.{BusinessException,TechnicalException}
 import com.normation.rudder.services.policies.VariableBuilderService
 import net.liftweb.json.JsonAST.JObject
 import com.normation.inventory.ldap.core.InventoryMapper
+import net.liftweb.json.Serialization
+import net.liftweb.json.NoTypeHints
 
 
 
@@ -78,7 +80,7 @@ class LDAPEntityMapper(
   , inventorymapper: InventoryMapper
 ) extends Loggable {
   
-  
+  implicit val formats = Serialization.formats(NoTypeHints)
     //////////////////////////////    Node    //////////////////////////////
 
   
@@ -97,12 +99,9 @@ class LDAPEntityMapper(
     entry +=! (A_NAME, node.name)
     entry +=! (A_DESCRIPTION, node.description)
     entry +=! (A_HOSTNAME, node.hostname)
-    entry +=! (A_PKEYS, node.publicKey)
-    entry +=! (A_LIST_OF_IP, node.ips:_*)
+    entry +=! (A_AGENT,  node.agents.map(x => Serialization.write(x)):_*)
     entry +=! (A_INVENTORY_DATE, GeneralizedTime(node.inventoryDate).toString)
     entry +=! (A_ROOT_USER, node.localAdministratorAccountName)
-    entry +=! (A_AGENTS_NAME, node.agentsName.map(x => x.toString):_*)
-    entry +=! (A_NODE_POLICY_SERVER, node.policyServerId.value)
     entry +=! (A_IS_BROKEN, node.isBroken.toLDAPString)
     entry +=! (A_IS_SYSTEM, node.isSystem.toLDAPString)
     
@@ -131,12 +130,11 @@ class LDAPEntityMapper(
       }
       inventory <- inventorybox
       checkSameID <- 
-        if(nodeEntry(A_NODE_UUID).isDefined && nodeEntry(A_NODE_UUID) == inventory.main.id.value ) Full("Ok")
-        else Failure("Mismatch id for the node %s and the inventory %s".format(nodeEntry(A_NODE_UUID), inventory.main.id.value))
+        if( nodeEntry(A_NODE_UUID).get == inventory.main.id.value) Full("Ok")
+        else Failure("Mismatch id for the node %s and the inventory %s".format(nodeEntry(A_NODE_UUID).get, inventory.main.id.value))
                      
       date <- nodeEntry.getAsGTime(A_OBJECT_CREATION_DATE) ?~! "Can not find mandatory attribute '%s' in entry".format(A_OBJECT_CREATION_DATE)
     } yield {
-      // fetch the inventory datetime of the object
 
   
       NodeInfo(
@@ -146,13 +144,11 @@ class LDAPEntityMapper(
           inventory.main.hostname,
           //OsType.osTypeFromObjectClasses(inventoryEntry.valuesFor(A_OC)).map(_.toString).getOrElse(""),
           inventory.main.osDetails.fullName,
-          inventoryEntry.valuesFor(A_LIST_OF_IP).toList, 
-          dateTime,
-          inventoryEntry(A_PKEYS).getOrElse(""),
-          scala.collection.mutable.Seq() ++ agentsName,
-          NodeId(policyServerId),
+   //       List(), 
+          inventory.inventoryDate.get,
+          inventory.main.agents,
           //nodeDit.NODES.NODE.idFromDn(policyServerDN).getOrElse(error("Bad DN found for the policy server of Node: %s".format(nodeEntry.dn))),
-          inventoryEntry(A_ROOT_USER).getOrElse(""),
+          inventory.main.rootUser,
           date.dateTime,
           nodeEntry.getAsBoolean(A_IS_BROKEN).getOrElse(false),
           nodeEntry.getAsBoolean(A_IS_SYSTEM).getOrElse(false)
@@ -184,11 +180,9 @@ class LDAPEntityMapper(
           policyServerNodeEntry(A_NAME).getOrElse(""),
           policyServerNodeEntry(A_DESCRIPTION).getOrElse(""),
           policyServerNodeEntry(A_HOSTNAME).getOrElse(""),
-          policyServerNodeEntry.valuesFor(A_LIST_OF_IP).toList, 
+        //  policyServerNodeEntry.valuesFor(A_LIST_OF_IP).toList, 
           dateTime,
-          policyServerNodeEntry(A_PKEYS).getOrElse(""),
-          scala.collection.mutable.Seq() ++ agentsName,
-          NodeId(psId),
+          policyServerNodeEntry.valuesFor(A_AGENT).toSeq.map(Serialization.read[com.normation.inventory.domain.Agent](_)),
           policyServerNodeEntry(A_ROOT_USER).getOrElse(""),
           date.dateTime,
           policyServerNodeEntry.getAsBoolean(A_IS_BROKEN).getOrElse(false),

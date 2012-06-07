@@ -66,6 +66,9 @@ import com.normation.rudder.repository.GitArchiveId
 import org.eclipse.jgit.lib.PersonIdent
 import com.normation.rudder.domain.Constants
 import com.normation.rudder.services.marshalling.TestFileFormat
+import com.normation.inventory.domain.Agent
+import com.normation.inventory.domain.NodeId
+import com.normation.inventory.domain.PublicKey
 
 /**
  * A service that helps mapping event log details to there structured data model.
@@ -500,7 +503,7 @@ class EventLogDetailsServiceImpl(
       os             <- (details \ "os").headOption.map( _.text ) ?~! ("Missing attribute 'os' in entry type node : " + entry)
       boxedAgentsName<- (details \ "agentsName").headOption.map  {
                               case x:NodeSeq => 
-                              (x \ "agentName").toSeq.map( (y:NodeSeq) => AgentType.fromValue(y.text) )
+                              (x \ "agentName").toSeq.map( (y:NodeSeq) => AgentType.fromValue(y.text).get )
                             } ?~! ("Missing attribute 'agentsName' in entry type node : " + entry)
       inventoryDate  <- (details \ "inventoryDate").headOption.map( _.text ) ?~! ("Missing attribute 'inventoryDate' in entry type node : " + entry)
       publicKey      <- (details \ "publicKey").headOption.map( _.text ) ?~! ("Missing attribute 'publicKey' in entry type node : " + entry)
@@ -511,19 +514,17 @@ class EventLogDetailsServiceImpl(
       isSystem       <- (details \ "isSystem").headOption.map(_.text.toBoolean ) 
       
     } yield {
-      val agentsNames =  com.normation.utils.Control.boxSequence[AgentType](boxedAgentsName)
-      
+      //val agentsNames =  com.normation.utils.Control.boxSequence[AgentType](boxedAgentsName)
+      val agents = Agent(name = boxedAgentsName.first, cfengineKey = Some(PublicKey(publicKey)),policyServerUUID = Some(NodeId(policyServerId))) +: boxedAgentsName.tail.map(name =>Agent(name = name))
       NodeLogDetails(node = NodeInfo(
           id            = NodeId(nodeId)
         , name          = name
         , description   = description
         , hostname      = hostname
         , os            = os
-        , ips           = ips.toList
+   //     , ips           = ips.toList
         , inventoryDate = ISODateTimeFormat.dateTimeParser.parseDateTime(inventoryDate)
-        , publicKey     = publicKey
-        , agentsName    = agentsNames.openOr(Seq())
-        , policyServerId= NodeId(policyServerId)
+        , agents = agents
         , localAdministratorAccountName= localAdministratorAccountName
         , creationDate  = ISODateTimeFormat.dateTimeParser.parseDateTime(creationDate)
         , isBroken      = isBroken

@@ -296,7 +296,7 @@ def jsInit(nodeId:NodeId, softIds:Seq[SoftwareUuid], salt:String="", tabContaine
           <b>Rudder ID:</b> {sm.node.main.id.value}<br/>
           {sm.node.main.agents.map{agent => 
             <div>
-            <b>Agent name:</b> {agent.name.getOrElse("Invalid agent")}<br/>
+            <b>Agent name:</b> {agent.name}<br/>
             <b>Policy server UUID:</b> {agent.policyServerUUID.map(_.value).getOrElse("Unkown")}<br/>
             <b>Policy server hostname:</b> {agent.policyServerHostname.getOrElse("Unkown")}<br/>
             <b>Owner:</b> {agent.owner.getOrElse("Unkown")}<br/>

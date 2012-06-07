@@ -174,8 +174,8 @@ class NodeConfigurationServiceImpl(
             targetMinimalNodeConfig = new MinimalNodeConfig(
                 info.name ,
                 info.hostname,
-                info.agentsName,
-                info.policyServerId.value,
+                info.agents.map(_.name),
+                info.agents.first.policyServerUUID.get.value,
                 info.localAdministratorAccountName                   
             ),
             None,
@@ -196,8 +196,8 @@ class NodeConfigurationServiceImpl(
             targetMinimalNodeConfig = new MinimalNodeConfig(
                 info.name ,
                 info.hostname,
-                info.agentsName,
-                info.policyServerId.value,
+                info.agents.map(_.name),
+                info.agents.first.policyServerUUID.get.value,
                 info.localAdministratorAccountName                   
             ),
             None,
@@ -251,8 +251,8 @@ class NodeConfigurationServiceImpl(
                   targetMinimalNodeConfig = new MinimalNodeConfig(
                       target.nodeInfo.name ,
                       target.nodeInfo.hostname ,
-                      target.nodeInfo.agentsName ,
-                      target.nodeInfo.policyServerId.value ,
+                      target.nodeInfo.agents.map(_.name) ,
+                      target.nodeInfo.agents.first.policyServerUUID.get.value ,
                       target.nodeInfo.localAdministratorAccountName
                       ),
                   targetSystemVariables = target.nodeContext
@@ -265,8 +265,8 @@ class NodeConfigurationServiceImpl(
                   targetMinimalNodeConfig = new MinimalNodeConfig(
                       target.nodeInfo.name ,
                       target.nodeInfo.hostname ,
-                      target.nodeInfo.agentsName ,
-                      target.nodeInfo.policyServerId.value ,
+                      target.nodeInfo.agents.map(_.name) ,
+                      target.nodeInfo.agents.first.policyServerUUID.get.value ,
                       target.nodeInfo.localAdministratorAccountName
                       ),
                   targetSystemVariables = target.nodeContext
@@ -322,8 +322,8 @@ class NodeConfigurationServiceImpl(
               new MinimalNodeConfig(
                   target.nodeInfo.name,
                   target.nodeInfo.hostname,
-                  target.nodeInfo.agentsName,
-                  target.nodeInfo.policyServerId.value,
+                  target.nodeInfo.agents.map(_.name) ,
+                  target.nodeInfo.agents.first.policyServerUUID.get.value ,
                   target.nodeInfo.localAdministratorAccountName
                   ),
               None,
@@ -339,8 +339,8 @@ class NodeConfigurationServiceImpl(
               new MinimalNodeConfig(
                   target.nodeInfo.name,
                   target.nodeInfo.hostname,
-                  target.nodeInfo.agentsName,
-                  target.nodeInfo.policyServerId.value,
+                  target.nodeInfo.agents.map(_.name) ,
+                  target.nodeInfo.agents.first.policyServerUUID.get.value ,
                   target.nodeInfo.localAdministratorAccountName
                   ),
               None,

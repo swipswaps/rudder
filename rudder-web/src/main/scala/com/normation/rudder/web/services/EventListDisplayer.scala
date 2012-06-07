@@ -673,11 +673,11 @@ class EventListDisplayer(
      "#hostname" #> details.node.hostname &
      "#description" #> details.node.description &
      "#os" #> details.node.os &
-     "#ips" #> details.node.ips.mkString("\n") &
+     //"#ips" #> details.node.ips.mkString("\n") &
      "#inventoryDate" #> DateFormaterService.getFormatedDate(details.node.inventoryDate) &
-     "#publicKey" #> details.node.publicKey &
-     "#agentsName" #> details.node.agentsName.mkString("\n") &
-     "#policyServerId" #> details.node.policyServerId.value &
+     "#publicKey" #> details.node.agents.first.cfengineKey.get.key &
+     "#agentsName" #> details.node.agents.aggregate("")(((s,ag) => "%s%s".format(s,ag.name)), (s1,s)=> "%s,".format(s)) &
+     "#policyServerId" #> details.node.agents.first.policyServerUUID.get.value &
      "#localAdministratorAccountName" #> details.node.localAdministratorAccountName &
      "#isBroken" #> details.node.isBroken &
      "#isSystem" #> details.node.isSystem &

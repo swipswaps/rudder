@@ -38,6 +38,7 @@ import com.normation.inventory.domain.AgentType
 import org.joda.time.DateTime
 import com.normation.inventory.domain.NodeId
 import com.normation.utils.HashcodeCaching
+import com.normation.inventory.domain.Agent
 
 /**
  * A NodeInfo is a read only object containing the information that will be
@@ -51,11 +52,9 @@ case class NodeInfo(
   , description   : String
   , hostname      : String
   , os            : String
-  , ips           : List[String]
+//  , ips           : List[String]
   , inventoryDate : DateTime
-  , publicKey     : String
-  , agentsName    : Seq[AgentType]
-  , policyServerId: NodeId
+  , agents        : Seq[Agent]
   , localAdministratorAccountName: String
   , creationDate  : DateTime
   , isBroken      : Boolean
@@ -74,14 +73,11 @@ case class PolicyServerNodeInfo(
   , override val name          : String
   , override val description   : String
   , override val hostname      : String
-  , override val ips           : List[String]
+ // , override val ips           : List[String]
   , override val inventoryDate : DateTime
-  , override val publicKey     : String
-  , override val agentsName    : Seq[AgentType]
-  , override val policyServerId: NodeId
+  , override val agents        : Seq[Agent]
   , override val localAdministratorAccountName : String
   , override val creationDate  : DateTime
   , override val isBroken      : Boolean
   , override val isSystem      : Boolean
-) extends NodeInfo(id, name, description,hostname,os = "", ips, inventoryDate, publicKey, 
-    agentsName, policyServerId, localAdministratorAccountName, creationDate, isBroken, isSystem) with HashcodeCaching 
+) extends NodeInfo(id, name, description,hostname,os = "",/* ips,*/ inventoryDate, agents, localAdministratorAccountName, creationDate, isBroken, isSystem) with HashcodeCaching 

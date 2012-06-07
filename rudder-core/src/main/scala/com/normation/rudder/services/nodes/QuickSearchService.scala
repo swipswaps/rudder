@@ -113,7 +113,7 @@ class QuickSearchServiceImpl(
 
         serverEntries      <- search(con, inventoryDit.NODES.dn, maxResult, serverFilter(in, nodeIdSet1), nodeInfoAttributes)
         serverPairs        <- { sequence(serverEntries) { e => 
-                                e(A_NODE_UUID).map(id => (NodeId(id),e)) 
+                                e(A_NODE_UUID).map(id => (NodeId(id),con.getTree(e.dn).get)) 
                               } }.map( _.toMap )
         nodeIdSet2         =  serverPairs.keySet
 
@@ -133,7 +133,7 @@ class QuickSearchServiceImpl(
   }
   
 
-def matchNodeInfoPairs( serverPairs:Map[NodeId,LDAPEntry], allNodePairs:Map[NodeId,LDAPEntry] ): Box[Seq[NodeInfo]] = {
+def matchNodeInfoPairs( serverPairs:Map[NodeId,LDAPTree], allNodePairs:Map[NodeId,LDAPEntry] ): Box[Seq[NodeInfo]] = {
   sequence( allNodePairs.toSeq ) { 
     case(id,nodeEntry) =>
       for {

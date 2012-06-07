@@ -45,11 +45,11 @@ import net.liftweb.common._
 class DummyNodeInfoService extends NodeInfoService {
 
   val allNodes = Seq[NodeInfo](
-    new PolicyServerNodeInfo(NodeId("root"), "root", "root", "root", "1.2.3.4"::"2.3.4.5"::Nil, DateTime.now(), "publicKey", Seq[AgentType](COMMUNITY_AGENT), NodeId("root"), "root", DateTime.now(), false, false  ), // root server
-      new NodeInfo(NodeId("one"), "one", "one", "one", "linux", "1.1.1.1" :: Nil, DateTime.now(), "key", Seq[AgentType](COMMUNITY_AGENT), NodeId("root"), "root", DateTime.now(), false, false), // first child
-      new NodeInfo(NodeId("two"), "two", "two", "two", "linux", "1.1.1.2" :: Nil, DateTime.now(), "key", Seq[AgentType](COMMUNITY_AGENT), NodeId("root"), "root", DateTime.now(), false, false), // second child
-      new PolicyServerNodeInfo(NodeId("relay"), "relay", "relay", "relay", "1.2.3.5"::"2.3.4.15"::Nil, DateTime.now(), "publicKeyrelay", Seq[AgentType](COMMUNITY_AGENT), NodeId("root"), "root", DateTime.now(), false, false  ), // relay server
-        new NodeInfo(NodeId("subone"), "subone", "subone", "subone", "linux", "1.1.1.1" :: Nil, DateTime.now(), "keysubone", Seq[AgentType](COMMUNITY_AGENT), NodeId("relay"), "root", DateTime.now(), false, false) // grandchild
+    new PolicyServerNodeInfo(NodeId("root"), "root", "root", "root", /*"1.2.3.4"::"2.3.4.5"::Nil,*/ DateTime.now(),  Seq[Agent](Agent(name=COMMUNITY_AGENT,policyServerUUID=Some(NodeId("root")),cfengineKey=Some(PublicKey("publicKey")))), "root", DateTime.now(), false, false  ), // root server
+      new NodeInfo(NodeId("one"), "one", "one", "one", "linux", /*"1.1.1.1" :: Nil,*/ DateTime.now(),  Seq[Agent](Agent(name=COMMUNITY_AGENT,policyServerUUID=Some(NodeId("root")),cfengineKey=Some(PublicKey("key")))), "root", DateTime.now(), false, false), // first child
+      new NodeInfo(NodeId("two"), "two", "two", "two", "linux", /*"1.1.1.2" :: Nil,*/ DateTime.now(),Seq[Agent](Agent(name=COMMUNITY_AGENT,policyServerUUID=Some(NodeId("root")),cfengineKey=Some(PublicKey("key")))), "root", DateTime.now(), false, false), // second child
+      new PolicyServerNodeInfo(NodeId("relay"), "relay", "relay", "relay", /*"1.2.3.5"::"2.3.4.15"::Nil,*/ DateTime.now(), Seq[Agent](Agent(name=COMMUNITY_AGENT,policyServerUUID=Some(NodeId("root")),cfengineKey=Some(PublicKey("publicKeyrelay")))), "root", DateTime.now(), false, false  ), // relay server
+        new NodeInfo(NodeId("subone"), "subone", "subone", "subone", "linux", /*"1.1.1.1" :: Nil,*/ DateTime.now(),Seq[Agent](Agent(name=COMMUNITY_AGENT,policyServerUUID=Some(NodeId("relay")),cfengineKey=Some(PublicKey("keysubone")))) , "root", DateTime.now(), false, false) // grandchild
   )
 
 

@@ -86,7 +86,7 @@ class SystemVariableServiceImpl(
     nodeInfo match {
       case policyServer: PolicyServerNodeInfo =>
         nodeConfigurationRoles.add("policy_server")
-        if (policyServer.id == policyServer.policyServerId)
+        if (policyServer.id == policyServer.agents.first.policyServerUUID.get.value)
           nodeConfigurationRoles.add("root_server")
       case _ =>
 
@@ -101,11 +101,11 @@ class SystemVariableServiceImpl(
 
     // Set the licences for the Nova
     val varLicensesPaid = SystemVariable(systemVariableSpecService.get("LICENSESPAID"))
-    if (nodeInfo.agentsName.contains(NOVA_AGENT)) {
-      licenseRepository.findLicense(nodeInfo.policyServerId.value) match {
+    if (nodeInfo.agents.map(_.name).contains(NOVA_AGENT)) {
+      licenseRepository.findLicense(nodeInfo.agents.first.policyServerUUID.get.value) match {
         case None =>
-          logger.warn("Caution, the policy server %s does not have a registered Nova license".format(nodeInfo.policyServerId.value))
-          throw new LicenseException("No license found for the policy server " + nodeInfo.policyServerId.value)
+          logger.warn("Caution, the policy server %s does not have a registered Nova license".format(nodeInfo.agents.first.policyServerUUID.get.value))
+          throw new LicenseException("No license found for the policy server " + nodeInfo.agents.first.policyServerUUID.get.value)
         case Some(x) => varLicensesPaid.saveValue(x.licenseNumber.toString)
       }
     } else {
@@ -142,7 +142,7 @@ class SystemVariableServiceImpl(
       case _ => // nothing special
     }
 
-    nodeInfoService.getNodeInfo(nodeInfo.policyServerId) match {
+    nodeInfoService.getNodeInfo(nodeInfo.agents.first.policyServerUUID.get) match {
       case Full(policyServer) => allowConnect += policyServer.hostname
       case f: EmptyBox => logger.error("Couldn't find the policy server of node %s".format(nodeInfo.id.value))
     }
