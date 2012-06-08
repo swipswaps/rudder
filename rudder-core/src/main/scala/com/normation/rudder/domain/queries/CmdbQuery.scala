@@ -53,6 +53,8 @@ import net.liftweb.json._
 import JsonDSL._
 import com.normation.exceptions.TechnicalException
 import com.normation.utils.HashcodeCaching
+import com.normation.ldap.sdk.Sub
+import com.normation.rudder.domain.queries.TStringComparator
 
 sealed trait CriterionComparator { 
   val id:String 
@@ -160,6 +162,24 @@ trait TStringComparator extends CriterionType {
     var xx = ""
     do { xx = x ; x = x.replaceAll("""\*\*""","""\*""") } while( xx.length != x.length)
     BuildFilter(attributeName + "=" + x)
+  }
+}
+
+
+
+case class JsonComparator(key:String) extends TStringComparator { 
+  override val comparators = BaseComparators.comparators
+  
+ 
+  
+  override def buildFilter(attributeName:String,comparator:CriterionComparator,value:String) : Filter = comparator match {
+    
+    //for equals and not equals, check value for jocker
+    case Equals => SUB(key,null,Array("\"%s\":\"%s\"".format(attributeName,value)) ,null)
+    case NotEquals => NOT(SUB(key,null,Array("\"%s\":\"%s\"".format(attributeName,value)) ,null))
+    case NotExists => NOT(HAS(key))
+    case Regex => HAS(key) //"default, non interpreted regex
+    case _ => HAS(key) //default to Exists
   }
 }
 

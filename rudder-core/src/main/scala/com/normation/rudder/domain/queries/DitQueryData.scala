@@ -42,6 +42,8 @@ import BuildFilter._
 import scala.collection.{SortedMap,SortedSet}
 import com.normation.rudder.services.queries.SpecialFilter
 import com.normation.utils.HashcodeCaching
+import com.normation.rudder.domain.queries.JsonComparator
+
 
 
 /*
@@ -135,7 +137,10 @@ class DitQueryData(dit:InventoryDit) {
       Criterion(A_PROCESSOR_NAME, StringComparator),
       Criterion(A_PROCESSOR_SPEED, LongComparator),
       Criterion(A_PROCESSOR_STEPPING, StringComparator),
-      Criterion(A_PROCESSOR_FAMILLY, StringComparator)
+      Criterion(A_PROCESSOR_FAMILLY, StringComparator),
+      Criterion(A_PROCESSOR_FAMILY_NAME, StringComparator),
+      Criterion(A_THREAD, StringComparator),
+      Criterion(A_CORE, StringComparator)
     )),
     ObjectCriterion(OC_SLOT, peObjectCriterion.criteria++ Seq(
       Criterion(A_SLOT_NAME, StringComparator)
@@ -195,7 +200,32 @@ class DitQueryData(dit:InventoryDit) {
       Criterion(A_FILE_COUNT, StringComparator),
       Criterion(A_FREE_SPACE, MemoryComparator),
       Criterion(A_TOTAL_SPACE, MemoryComparator)
+    )),
+    ObjectCriterion(OC_PROCESS,  leObjectCriterion.criteria ++ Seq(
+      Criterion(A_CMD_NAME, StringComparator),
+      Criterion(A_CPU_USAGE, StringComparator),
+      Criterion(A_MEMORY_USAGE, StringComparator),
+      Criterion(A_PROC_USER, StringComparator)
+      /*Some other criterion
+      val A_PID = "processID"
+  val A_PROC_START = "start"
+  val A_TTY = "tty"
+  val A_VIRTUAL_MEMORY = "virtualMemory"*/
+    )),
+    ObjectCriterion(OC_VM_INFO,  leObjectCriterion.criteria ++ Seq(
+      Criterion(A_VM_TYPE, StringComparator),
+      Criterion(A_VM_OWNER, StringComparator),
+      Criterion(A_VM_STATUS, StringComparator),
+      Criterion(A_VM_CPU, StringComparator)
+    )),
+    ObjectCriterion(A_EV, Seq(
+      Criterion("name", JsonComparator(A_EV)),
+      Criterion("value", JsonComparator(A_EV))
     ))/*,
+        val A_VM_ID = "virtualMachineUuid"
+  val A_VM_SUBSYSTEM = "subsystem"
+  val A_VM_NAME = "vmName"
+  val A_VM_MEMORY = "vmMemory"
     ObjectCriterion(OC_GROUP_OF_DNS,Seq(
       Criterion(A_NAME,GroupOfDnsComparator)
     ))*/ // Hidding a code difficult to import
@@ -247,6 +277,9 @@ case class LDAPObjectType(
     "node" -> LDAPObjectType(dit.NODES.dn, One, ALL, DNJoin),
     "networkInterfaceLogicalElement" -> LDAPObjectType(dit.NODES.dn, Sub, IS(OC_NET_IF), ParentDNJoin),
     "fileSystemLogicalElement" -> LDAPObjectType(dit.NODES.dn, Sub, IS(OC_FS), ParentDNJoin),
+    "processLogicalElement" -> LDAPObjectType(dit.NODES.dn, Sub, IS(OC_PROCESS), ParentDNJoin),
+    "virtualMachineLogicalElement" -> LDAPObjectType(dit.NODES.dn, Sub, IS(OC_VM_INFO), ParentDNJoin),
+    "environnementVariable" -> LDAPObjectType(dit.NODES.dn, One, ALL, DNJoin),
     "machine" -> LDAPObjectType(dit.MACHINES.dn, One, ALL, DNJoin),
     "processorPhysicalElement" -> LDAPObjectType(dit.MACHINES.dn, Sub, IS(OC_PROCESSOR), ParentDNJoin),
     "memoryPhysicalElement" -> LDAPObjectType(dit.MACHINES.dn, Sub, IS(OC_MEMORY), ParentDNJoin),
@@ -266,6 +299,9 @@ case class LDAPObjectType(
     "node" -> QueryNodeDn,
     "networkInterfaceLogicalElement" -> QueryNodeDn,
     "fileSystemLogicalElement" -> QueryNodeDn,
+    "processLogicalElement" -> QueryNodeDn,
+    "virtualMachineLogicalElement" -> QueryNodeDn,
+    "environnementVariable" -> QueryNodeDn,
     "machine" -> QueryMachineDn,
     "processorPhysicalElement" -> QueryMachineDn,
     "memoryPhysicalElement" -> QueryMachineDn,
@@ -288,6 +324,9 @@ case class LDAPObjectType(
     "node" -> DNJoin,
     "networkInterfaceLogicalElement" -> ParentDNJoin,
     "fileSystemLogicalElement" -> ParentDNJoin,
+    "processLogicalElement" -> ParentDNJoin,
+    "virtualMachineLogicalElement" -> ParentDNJoin,
+    "environnementVariable" -> DNJoin,
     "machine" -> DNJoin,
     "processorPhysicalElement" -> ParentDNJoin,
     "memoryPhysicalElement" -> ParentDNJoin,
