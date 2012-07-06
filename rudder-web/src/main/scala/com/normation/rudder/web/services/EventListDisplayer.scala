@@ -344,8 +344,8 @@ class EventListDisplayer(
                 "#longDescription *" #> mapSimpleDiff(modDiff.modLongDescription) &
                 "#target" #> (
                   modDiff.modTarget.map { diff =>
-                   ".diffOldValue" #> groupTargetDetails(diff.oldValue) &
-                   ".diffNewValue" #> groupTargetDetails(diff.newValue)
+                   ".diffOldValue *" #> groupTargetDetails(diff.oldValue) &
+                   ".diffNewValue *" #> groupTargetDetails(diff.newValue)
                   }
                 ) &
                 "#policies" #> (
@@ -359,8 +359,8 @@ class EventListDisplayer(
                            }
                          }
                    }
-                   ".diffOldValue" #> mapList(diff.oldValue) &
-                   ".diffNewValue" #> mapList(diff.newValue)
+                   ".diffOldValue *" #> mapList(diff.oldValue) &
+                   ".diffNewValue *" #> mapList(diff.newValue)
                    }
                 )
               )(crModDetailsXML)}
@@ -390,9 +390,9 @@ class EventListDisplayer(
                 "#ptVersion *" #> mapSimpleDiff(modDiff.modTechniqueVersion) &
                 "#parameters" #> (
                   modDiff.modParameters.map { diff =>
-                    ".diffOldValue" #> 
+                    ".diffOldValue *" #> 
                       <pre>{xmlPretty.format(SectionVal.toXml(diff.oldValue))}</pre> &
-                    ".diffNewValue" #> 
+                    ".diffNewValue *" #> 
                       <pre>{xmlPretty.format(SectionVal.toXml(diff.newValue))}</pre>
                   }
                 ) 
@@ -451,8 +451,8 @@ class EventListDisplayer(
                         case Some(q) => Text(q.toJSONString)
                       }
                       
-                     ".diffOldValue" #> mapOptionQuery(diff.oldValue) &
-                     ".diffNewValue" #> mapOptionQuery(diff.newValue)
+                     ".diffOldValue *" #> mapOptionQuery(diff.oldValue) &
+                     ".diffNewValue *" #> mapOptionQuery(diff.newValue)
                     }
                 ) &
                 "#nodes" #> (
@@ -465,8 +465,8 @@ class EventListDisplayer(
                        .map(id => <a href={nodeLink(id)}>{id.value}</a>)
                        .reduceLeft[NodeSeq]((a,b) => a ++ <span>,&nbsp;</span> ++ b)
                      }
-                   ".diffOldValue" #> mapList(diff.oldValue) &
-                   ".diffNewValue" #> mapList(diff.newValue)
+                   ".diffOldValue *" #> mapList(diff.oldValue) &
+                   ".diffNewValue *" #> mapList(diff.newValue)
                    }
                 ) 
               )(groupModDetailsXML)}
@@ -578,8 +578,8 @@ class EventListDisplayer(
             
             <div class="evloglmargin">{
               (
-                  ".diffOldValue" #> networksToXML(details.oldNetworks) &
-                  ".diffNewValue" #> networksToXML(details.newNetworks)
+                  ".diffOldValue *" #> networksToXML(details.oldNetworks) &
+                  ".diffNewValue *" #> networksToXML(details.newNetworks)
               )(authorizedNetworksXML)
             }
             { reasonHtml }
@@ -726,13 +726,13 @@ class EventListDisplayer(
   )(xml)
   
  private[this] def mapSimpleDiff[T](opt:Option[SimpleDiff[T]]) = opt.map { diff =>
-   ".diffOldValue" #> diff.oldValue.toString &
-   ".diffNewValue" #> diff.newValue.toString
+   ".diffOldValue *" #> diff.oldValue.toString &
+   ".diffNewValue *" #> diff.newValue.toString
   }  
   
  private[this] def mapSimpleDiff[T](opt:Option[SimpleDiff[T]], id: DirectiveId) = opt.map { diff =>
-   ".diffOldValue" #> diff.oldValue.toString &
-   ".diffNewValue" #> diff.newValue.toString &
+   ".diffOldValue *" #> diff.oldValue.toString &
+   ".diffNewValue *" #> diff.newValue.toString &
    "#directiveID" #> id.value
   }  
   

@@ -2007,6 +2007,11 @@ td.severityWidth, th.severityWidth {
 tr.unfoldable {
   cursor:pointer;
 }
+
+.diffOldValue {
+    text-decoration:line-through;
+}
+
 /***********************************
  * Quicksearch
 ************************************/
