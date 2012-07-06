@@ -314,6 +314,7 @@ class EventListDisplayer(
               { ruleDetails(crDetailsXML, addDiff.rule)}
               { reasonHtml }
             </div>
+          case Failure(m,_,_) => <p>{m}</p>
           case e:EmptyBox => errorMessage(e)
         })
       
@@ -661,7 +662,8 @@ class EventListDisplayer(
   }
   
   private[this] def groupTargetDetails(targets: Set[RuleTarget]): NodeSeq = {
-    targets
+    (targets
+      .toSeq
       .map{ target =>
         target match {
           case GroupTarget(id@NodeGroupId(g)) => 
@@ -669,8 +671,7 @@ class EventListDisplayer(
           case x => 
             <span>{Text("group_special(" + x.toString + ")")}</span>
         }
-      }
-      .reduceLeft[NodeSeq]((a,b) => a ++ b)
+      })
   }
       
   
