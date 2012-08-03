@@ -230,8 +230,18 @@ class DirectiveManagement extends DispatchSnippet with Loggable {
           if (!technique.compatible.isEmpty) technique.compatible.head.toHtml 
           else NodeSeq.Empty
         } &
-        "#techniqueDescription" #>  technique.description &
-        "#techniqueLongDescription" #>  technique.longDescription &
+        "#techniqueDescription" #>  {
+          technique.description match {
+            case "" => NodeSeq.Empty
+            case _ => <div class="directiveAbout"><b>Description: </b>{technique.description}</div>
+          }
+        } &
+        "#techniqueLongDescription" #>  {
+          technique.longDescription match {
+            case "" => NodeSeq.Empty
+            case _ => <div class="directiveAbout"><b>Long Description: </b>{technique.longDescription}</div>
+          }
+        } &
         "#isSingle *" #> showIsSingle(technique) &
         "#techniqueVersions" #> showVersions(activeTechnique) &
         "#migrate" #> showMigration(technique, activeTechnique) &
@@ -250,11 +260,11 @@ class DirectiveManagement extends DispatchSnippet with Loggable {
     <span>
       {
         if(technique.isMultiInstance) {
-          {<b>Multi instance</b>} ++ 
-          Text(": several Directives derived from that template can be deployed on a given server")
+          {<b>Note: </b>} ++ 
+          Text("several Directives derived from that template can be deployed on a given server.")
         } else {
-          {<b>Unique</b>} ++ 
-          Text(": an unique Directive derived from that template can be deployed on a given server")
+          {<b>Note: </b>} ++ 
+          Text("an unique Directive derived from that template can be deployed on a given server.")
         }
       }
     </span>

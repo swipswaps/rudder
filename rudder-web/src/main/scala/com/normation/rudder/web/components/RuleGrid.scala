@@ -166,10 +166,11 @@ class RuleGrid(
           { "sWidth": "60px" },
           { "sWidth": "100px"  },
           { "sWidth": "100px" } %2$s
-        ]
-      });moveFilterAndFullPaginateArea('#%1$s'); 
-      $("#%1$s_filter").insertAfter('#actions_zone');
-      $("#%1$s_length").insertAfter('#actions_zone');
+        ],
+       "sDom": '<"dataTables_wrapper_top"fl>rt<"dataTables_wrapper_bottom"ip>'
+      });
+      $('.dataTables_filter input').attr("placeholder", "Search");
+
       createTooltip();""".format(
           htmlId_rulesGridId,
           { if(showCheckboxColumn) """, { "sWidth": "30px" }""" else "" }

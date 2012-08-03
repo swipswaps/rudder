@@ -239,10 +239,32 @@ class RuleEditForm(
     val updatedrule = ruleRepository.get(rule.id)
     (
       "#details *" #> { (n:NodeSeq) => SHtml.ajaxForm(n) } andThen
-      "#nameField" #>    <div>{crName.displayNameHtml.get} {updatedrule.map(_.name).openOr("could not fetch rule name")}</div> &
-      "#shortDescriptionField" #>  <div>{crShortDescription.displayNameHtml.get} {updatedrule.map(_.shortDescription).openOr("could not fetch rule short descritption")}</div> &
-      "#longDescriptionField" #>  <div>{crLongDescription.displayNameHtml.get} {updatedrule.map(_.longDescription).openOr("could not fetch rule long descritption")}</div> &
-      "#compliancedetails" #> showCompliance(updatedrule.get)
+      "#nameField" #>
+        <div>
+          <b>Name: </b> 
+          {updatedrule.map(_.name).openOr("could not fetch rule name")}
+        </div><br /> &
+      "#shortDescriptionField" #> {
+        val shortDescription =  updatedrule.map(_.shortDescription)
+          .openOr("could not fetch rule short descritption")
+        shortDescription match {
+          case "" => NodeSeq.Empty
+          case _ => <div><b>Short description: </b> {shortDescription}</div><br />
+        } 
+      } &
+      "#longDescriptionField" #>  {
+        val longDescription =  updatedrule.map(_.longDescription)
+          .openOr("could not fetch rule long descritption")
+        longDescription match {
+          case "" => NodeSeq.Empty
+          case _ => <div><b>Long description: </b> {longDescription}</div><br />
+        } 
+      } &
+      "#compliancedetails" #> 
+        <fieldset>
+          <legend>Compliance details</legend>
+          {showCompliance(updatedrule.get)}
+        </fieldset>
     )(details) ++
     Script(JsRaw("""
         $(".unfoldable").click(function(event) {

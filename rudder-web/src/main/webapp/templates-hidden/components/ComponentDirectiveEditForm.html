@@ -1,6 +1,5 @@
 <xml:group>
 
-
 <component:staticInit>
 <head>
   <style type="text/css">
@@ -86,40 +85,14 @@
 <component:form>
   <div id="editForm" class="object-details">
     <lift:authz role="directive_edit">
-    <fieldset class="topLevelAction">
-      <p class="clearable">
-        This is the zone for top level actions which does not take into account
-        modifications done in the edit zone.
-      </p>
-
-      <legend>Modify Directive status</legend>
-
-      <div id="removeAction" class="twoColumns">
-        <button id="removeButton">Delete</button>
-      </div>
-      <div id="desactivateAction" class="twoColumns twoColumnsRight">
-        <button id="disactivateButton"><span id="disactivateButtonLabel">desactivate</span></button>
-      </div>
-      <div class="disableNotice">
-        Note: A Directive's status may be Enabled, but it will be effectively disabled
-        if the Technique it's based on is disabled.
-       </div>
-    </fieldset>
 	</lift:authz>
     <fieldset class="editZone">
       <legend>Directive settings</legend>
-
       <div id="notifications">
 <!--         <ul> -->
 <!--           <li>Here comes notifications</li> -->
 <!--         </ul> -->
       </div>
-      <hr class="spacer" />
-
-      <p>This Directive is based on the <b><span id="techniqueName"/></b> Technique.</p>
-      <p id="isSingle">Unique Technique</p> 
-      <fieldset><legend>Description of the Technique</legend><span id="techniqueDescription"/></fieldset>
-      <br/>
       <div id="nameField">
         Here comes the name field
       </div>
@@ -138,10 +111,23 @@
       <div id="longDescriptionField">
         Here comes the longDescription field
       </div>
+      
+      <hr class="spacer" />
+      <div style="vertical-align:middle;margin-top:7px;">
+        <span class="threeCol wbBaseFieldLabel textright"><b>Base Technique:</b></span>
+        <div class="twoCol" style="color:#555">
+	        <div style="width:100%"><span id="techniqueName" /></div>
+		    <div style="margin-top:5px;"><b>Description:</b> <span id="techniqueDescription"/></div>
+		    <div style="margin-top:5px;"><b>Note:</b> <span id="isSingle">Unique Technique</span></div> 
+	    </div>
+      </div>
+      
+      
+      <br />
 
       <hr class="spacer"/>
 
-      <fieldset><legend>Parameters</legend>
+      <fieldset id="directiveFormParameters"><legend>Parameters</legend>
         <span id="parameters">Here goes the list of parameters</span>
       </fieldset>
 	<lift:authz role="directive_edit">
@@ -157,11 +143,20 @@
     </div>
     </fieldset>
     
-      <div class="cpiefsave">
+    <div class="margins" align="right">
+      <div style="float:left" align="left">
+	      <span id="removeAction">
+	        <button id="removeButton">Delete</button>
+	      </span>
+	      <span id="desactivateAction">
+	        <button id="disactivateButton"><span id="disactivateButtonLabel">desactivate</span></button>
+	      </span>
+          <button id="clone">[Clone]</button>
+      </div>
+      <div style="float:right" align="right" class="cpiefsave">
         <button id="save">Save</button>
       </div>
-      
-      <button id="clone">[Clone]</button>
+    </div>
       </lift:authz>
     </fieldset>
   </div>

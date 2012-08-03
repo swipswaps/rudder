@@ -42,7 +42,7 @@ var clearSearchFieldTree = function(inputId, treeId) {
     </div>
     <hr class="spacer"/>
     
-    <div class="column">
+    <div class="columnDirectiveManagement">
       <div class="portlet">
         <div class="portlet-header">Library</div>
         <div class="portlet-content">
@@ -58,34 +58,25 @@ var clearSearchFieldTree = function(inputId, treeId) {
         </div>
       </div>
     </div>
-    <div class="column">
+    <div class="columnDirectiveManagement">
       <div class="portlet">
         <div class="portlet-header"><span id="detailsPortletTitle">Usage</span></div>
         <div class="portlet-content">
           <lift:configuration.DirectiveManagement.techniqueDetails>
             <div id="techniqueDetails">
             <fieldset class="deca"><legend id="detailFieldsetId">Technique details</legend>
-              <div id="directiveIntro">
-                The Directive <b class="directive">[Directive]</b> is based on following Technique:
-                <br/><br/>
-              </div>
-              <div>
-                <h3><span id="techniqueName">[Technique name]</span></h3>
-                <i><span id="techniqueDescription">[technique.description]</span></i>
-              </div>
-            
+              <h3><span id="techniqueName">[Technique name]</span></h3>
               <div class="groupDiv">
-                <p id="techniqueLongDescription">[technique.longDescription]</p>
-                <p id="isSingle">[Unique Technique]</p>
-                <p></p>
-                <p><span id="compatibility">[Supported operating systems : debian-5]</span></p>
+                <div id="techniqueDescription">[technique.description]</div>
+                <div id="techniqueLongDescription">[Long Description]</div>
+                <div class="directiveAbout"><span id="isSingle">[Unique Technique]</span></div>
+                <div class="directiveAbout"><span id="compatibility">[Supported operating systems : debian-5]</span></div>
               </div>
               <fieldset class="pimversionspad"><legend>Versions available</legend>
                 <ul class="evlogviewpad">
                   <li id="techniqueVersions">[here come version: date]</li>
                 </ul>
                 <div id="migrate">
-                  <br/>
                   <form>
                     Migrate Directive to Technique version:
                     <select><option>1.1</option><option>2.0</option></select>

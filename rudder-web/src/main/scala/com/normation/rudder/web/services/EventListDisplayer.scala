@@ -111,10 +111,11 @@ class EventListDisplayer(
             "bAutoWidth": false,
             "bFilter" :true,
             "bPaginate" :true,
-            "bLengthChange": false,
+            "bLengthChange": true,
             "sPaginationType": "full_numbers",
+            "bJQueryUI": false,
             "oLanguage": {
-              "sSearch": "Filter:"
+              "sSearch": ""
             },
             "bJQueryUI": false,
             "aaSorting":[],
@@ -124,8 +125,12 @@ class EventListDisplayer(
               , { "sWidth": "110px" }
               , { "sWidth": "110px" }
               , { "sWidth": "100px" }
-            ]
-          });moveFilterAndFullPaginateArea('#%s');""".format(gridName,gridName).replaceAll("#table_var#",jsGridName)
+            ],
+            "sDom": '<"dataTables_wrapper_top"fl>rt<"dataTables_wrapper_bottom"ip>'
+          })
+          $('.dataTables_filter input').attr("placeholder", "Search"); 
+            
+          """.format(gridName,gridName).replaceAll("#table_var#",jsGridName)
         )  &
         JsRaw("""
         /* Formating function for row details */          

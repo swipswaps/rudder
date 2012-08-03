@@ -956,20 +956,20 @@
 			 */
 			this.oLanguage = {
 				"sProcessing": "Processing...",
-				"sLengthMenu": "Show _MENU_ entries",
+				"sLengthMenu": "_MENU_",
 				"sZeroRecords": "No matching records found",
 				"sEmptyTable": "No data available in table",
-				"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
+				"sInfo": "_START_ to _END_ of _TOTAL_ entries",
 				"sInfoEmpty": "Showing 0 to 0 of 0 entries",
 				"sInfoFiltered": "(filtered from _MAX_ total entries)",
 				"sInfoPostFix": "",
-				"sSearch": "Search:",
+				"sSearch": "",
 				"sUrl": "",
 				"oPaginate": {
-					"sFirst":    "First",
-					"sPrevious": "Previous",
-					"sNext":     "Next",
-					"sLast":     "Last"
+					"sFirst":    "«",
+					"sPrevious": "‹",
+					"sNext":     "›",
+					"sLast":     "»"
 				},
 				"fnInfoCallback": null
 			};

@@ -274,6 +274,7 @@ class AcceptNode {
      * Display the list of selected server, and the accept/refuse button
      */
     def listNode(listNode : Seq[NodeId], template : NodeSeq) : NodeSeq = {
+      (
         serverSummaryService.find(pendingNodeDit,listNode:_*) match {
           case Full(servers) => 
             bind("servergrid",template, 
@@ -302,6 +303,28 @@ class AcceptNode {
             logger.debug(error.messageChain, e)
             NodeSeq.Empty
         }
+       ) ++ Script(
+           OnLoad(JsRaw("""
+          /* Event handler function */
+          var #table_var# = $('#%1$s').dataTable({
+            "asStripClasses": [ 'color1', 'color2' ],
+            "bAutoWidth": false,
+            "bFilter" : true,
+            "bPaginate" : true,
+            "bLengthChange": true,
+            "sPaginationType": "full_numbers",
+            "bJQueryUI": false,
+            "oLanguage": {
+              "sSearch": ""
+            },
+           "sDom": '<"dataTables_wrapper_top"fl>rt<"dataTables_wrapper_bottom"ip>'
+          });
+          $('.dataTables_filter input').attr("placeholder", "Search");
+    
+         """.format(gridHtmlId)
+            .replaceAll("#table_var#", "oTable" + gridHtmlId)
+        )) 
+      )
     }
   
   /**

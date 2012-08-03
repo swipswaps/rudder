@@ -111,12 +111,13 @@ td.nodeIndernal {
  **********************************/
 
 .portlet-header {
-   padding: 5px 0 5px 5px;
+   padding: 5px 0 5px 15px;
    font-size: 1.3em;
    font-weight: bold;
    cursor: default;
-   background: none;
+   background: url(../images/icCroix.jpg) no-repeat top left;
 }
+
 .portlet-header .ui-icon {
    float: right;
    cursor: pointer;
@@ -133,7 +134,7 @@ div.intro {
 }
 
 div.intro div {
-  padding: 5px;
+  padding: 5px 5px 5px 15px;
 }
 
 div.intro div ul {
@@ -358,11 +359,9 @@ table {
 }
 
 #eventLogsGrid {
-  margin:10px;	
-}
-
-#grid_rules_grid_zone {
-  margin: 10px;	
+  width:100%;	
+  border-left: 1px solid #B4B3A8;
+  border-right: 1px solid #B4B3A8;
 }
 
 #acceptNodeGrid_wrapper {
@@ -468,11 +467,6 @@ div#Detail {
 * Custom for DataTable
 ***********************/
 
-.dataTables_filter {
-  margin: 10px;
-  text-align: right;
-}
-
 .paginate {
   width : 50%;
   align:left;
@@ -511,18 +505,67 @@ div#Detail {
 /**********************************
  * Pagination nested 
  **********************************/
+
+.dataTables_filter {
+  text-align: right;
+  width:50%;
+  float:right;
+}
+
+.dataTables_filter input {
+  border: 1px solid #B4B3A8;
+  padding: 2px;
+}
+
+.dataTables_length select {
+  padding: 1px;
+}
+
+.dataTables_length {
+  widht:40%;
+  float:left;
+}
  
 .dataTables_paginate {
   float: right;
   text-align: right;
-  padding-left: 5px;
 }
 
 .dataTables_info {
-  float: right;
-  height: 19px;
-  padding-top: 3px;
-  padding-right: 5px;
+  float: left;
+  width: 50%;
+}
+
+.dataTables_wrapper {
+	margin: 10px 10px 0px 5px;
+}
+
+.dataTables_wrapper_top {
+  padding: 6px;
+  overflow: hidden;
+  display: inline-block; 
+  display: block; 
+  border-top: 1px solid #B4B3A8;
+  border-right: 1px solid #B4B3A8;
+  border-left: 1px solid #B4B3A8;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.dataTables_wrapper_bottom {
+  padding: 6px;
+  overflow: hidden;
+  display: inline-block; 
+  display: block;
+  border: 1px solid #B4B3A8;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+#grid_rules_grid_zone {
+  border-left: 1px solid #B4B3A8;
+  border-right: 1px solid #B4B3A8;
+  width: 100%;
 }
 
 .paginate_disabled_previous, .paginate_enabled_previous, .paginate_disabled_next, .paginate_enabled_next {
@@ -565,7 +608,7 @@ div#Detail {
   float:right;
 }
 .pimversionspad{
-  padding:20px;
+  padding:2px;
 }
 .wbBaseField * {
   vertical-align: middle;
@@ -926,23 +969,28 @@ div.dataTables_scroll {
 
 
 .paginate_button {
-  border: 1px solid #d3d3d3;
   padding: 2px 6px;
   margin: 0;
   cursor: pointer;
+  font-size:12px;
+}
+
+.paginate_button:hover {
+  background-color: #FFF3C9;
+  text-decoration: underline;
 }
 
 .paginate_button_disabled {
-  border: 1px solid #d3d3d3;
   padding: 2px 6px;
   margin: 0;
+  color: dimGray;
 }
 
 .paginate_active {
-  border: 1px solid #d3d3d3;
   padding: 2px 6px;
   margin: 0;
   color: #333333;
+  font-size:13px;
   font-weight: bold;
 }
 
@@ -1325,7 +1373,7 @@ div#contenu {
    position: relative;
    float: left;
    width: 77%;
-   padding-left: 30px;
+   padding-left: 20px;
    background-color: #2e2d2d;
 }
 #contenu h1 {
@@ -1346,6 +1394,10 @@ p#filAriane {
 Home portlet
 **************************************/
 
+.columnDirectiveManagement {
+   width: 50%;
+   float: left;
+}
 .column {
    width: 50%;
    float: left;
@@ -1354,7 +1406,12 @@ Home portlet
 .portlet {
    margin: 0 1em 1em 0;
    background-color: #fff;
-   background/*\**/:  url(../images/fondPortlet.jpg) repeat-x\9;
+   background:  url(../images/fondPortlet.jpg) repeat-x\9;
+}
+.inner-portlet {
+   margin: 2px 10px 8px 10px;
+   background-color: #fff;
+   background:  url(../images/fondPortlet.jpg) repeat-x\9;
 }
 *html .portlet {
    background: url(../images/fondPortlet.jpg) repeat-x;
@@ -1388,12 +1445,6 @@ p img {
 }
 .portlet li {
    list-style-type: none;
-}
-.portlet-header {
-   padding: 5px 0 5px 25px;
-   font-size: 1.3em;
-   font-weight: bold;
-   background: url(../images/icCroix.jpg) no-repeat top left;
 }
 *html .portlet-header {
 }
@@ -1435,7 +1486,7 @@ div#refusePopup {
 * Popup
 ********************/
 #actions_zone{
-  margin:15px;
+  margin:10px 10px 0px 5px;
 }
 .popcurs{
   text-decoration: underline;
@@ -1746,7 +1797,10 @@ color: #FF0000 !important;
   display:none; 
 }
 .deca{
-  padding: 10px;
+  padding-top: 5px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  padding-right: 10px;
 }
 .inline{
   display:inline;
@@ -2008,9 +2062,9 @@ div.tabInform {
   font-weight:bold;
 }
 
-#parameters {
-/*   margin-top: 3px; */
-/*   margin-left: 5px; */
+#directiveFormParameters {
+   margin-top: 5px;
+   margin-bottom: 5px;
 }
 
 /***********************************
@@ -2166,4 +2220,43 @@ li.disableTreeNode > a {
 .homePageBlock li {
   list-style-type: disc;
   list-style-position:inside;
+}
+
+fieldset {
+  border: 1px solid #B4B3A8;
+}
+
+.reasonsFieldset {
+  width: 96%;
+  margin-top: 5px;
+  margin-right: 5px;
+  display: inline-block;
+}
+
+.directiveAbout {
+	margin-top:4px;
+}
+
+#migrate {
+	margin: 4px;
+}
+
+
+.inner-portlet-header {
+  padding: 5px 0 5px 5px;
+  font-size: 1.3em;
+  font-weight: bold;
+  cursor: default;
+  background: none;
+  border-bottom: 1px solid #F79D10;
+  padding: 5px 0 2px 5px;
+}
+
+.inner-portlet-content {
+  padding: 5px 0 2px 5px;
+}
+
+.arrondishaut {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
 }

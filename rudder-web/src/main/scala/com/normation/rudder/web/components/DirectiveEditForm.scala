@@ -440,11 +440,9 @@ class DirectiveEditForm(
     <span>
       {
         if (technique.isMultiInstance) {
-          { <b>Multi instance</b> } ++ 
-          Text(": several Directives derived from that template can be deployed on a given node")
+          Text(" several Directives derived from that template can be deployed on a given node")
         } else {
-          { <b>Unique</b> } ++ 
-          Text(": an unique Directive derived from that template can be deployed on a given node")
+          Text(" an unique Directive derived from that template can be deployed on a given node")
         }
       }
     </span>
@@ -471,7 +469,7 @@ class DirectiveEditForm(
   private[this] val piLongDescription = {
     new WBTextAreaField("Description", directive.longDescription.toString) {
       override def setFilter = notNull _ :: trim _ :: Nil
-      override def inputField = super.inputField % ("style" -> "height:15em")
+      override def inputField = super.inputField % ("style" -> "height:10em")
     }
   }
 
