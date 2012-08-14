@@ -110,10 +110,14 @@ object PendingHistoryGrid extends Loggable {
             "asStripClasses": [ 'color1', 'color2' ],
             "bAutoWidth": false,
             "bFilter" :true,
-            "bLengthChange": false,
+            "bLengthChange": true,
             "bJQueryUI": false,
-            "aaSorting": [[ 0, "desc" ]]
-          });moveFilterAndPaginateArea('#pending_server_history');""".replaceAll("#table_var#",jsVarNameForId)
+            "aaSorting": [[ 0, "desc" ]],
+            "sPaginationType": "full_numbers",
+            "sDom": '<"dataTables_wrapper_top"fl>rt<"dataTables_wrapper_bottom"ip>'
+          });
+          $('.dataTables_filter input').attr("placeholder", "Search");            
+          """.replaceAll("#table_var#",jsVarNameForId)
         ) & initJsCallBack
        )
   }
