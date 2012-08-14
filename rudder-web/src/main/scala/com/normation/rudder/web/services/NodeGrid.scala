@@ -104,7 +104,7 @@ class NodeGrid(getNodeAndMachine:LDAPFullInventoryRepository) extends Loggable {
       columns:Seq[(Node,Srv => NodeSeq)]=Seq(), 
       aoColumns:String ="", 
       searchable : Boolean = true, 
-      paginate : Boolean = false
+      paginate : Boolean = true
    ) : NodeSeq = {
     display(servers, tableId, columns, aoColumns) ++
     Script(initJs(tableId, columns, aoColumns, searchable, paginate))    
@@ -135,15 +135,18 @@ class NodeGrid(getNodeAndMachine:LDAPFullInventoryRepository) extends Loggable {
             "bAutoWidth": false,
             "bFilter" :%s,
             "bPaginate" :%s,
-            "bLengthChange": false,
+            "bLengthChange": true,
             "bJQueryUI": false,
             "aaSorting": [[ 0, "asc" ]],
+            "sPaginationType": "full_numbers",
             "aoColumns": [ 
               { "sWidth": "180px" },
               { "sWidth": "200px" },
               { "sWidth": "100px" } %s
-            ]
-          });moveFilterAndPaginateArea('#%s');""".format(tableId,searchable,paginate,aoColumns,tableId).replaceAll("#table_var#",jsVarNameForId(tableId))
+            ],
+            "sDom": '<"dataTables_wrapper_top"fl>rt<"dataTables_wrapper_bottom"ip>'
+          });
+            """.format(tableId,searchable,paginate,aoColumns).replaceAll("#table_var#",jsVarNameForId(tableId))
         ) &
         
         initJsCallBack(tableId)

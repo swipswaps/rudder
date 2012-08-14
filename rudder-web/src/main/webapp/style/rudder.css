@@ -320,6 +320,11 @@ form input.removeLineButton {
 /**************************************
 Tableau
 **************************************/
+#acceptNodeGrid {
+  width:100%;
+  border-left: 1px solid #B4B3A8;
+  border-right: 1px solid #B4B3A8;
+}
 #pending_server_history {
   width:100%;
   border-left: 1px solid #B4B3A8;

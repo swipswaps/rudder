@@ -370,7 +370,7 @@ class AcceptNode {
               
         ),         
         """,{ "sWidth": "60px" },{ "sWidth": "35px", "bSortable":false },{ "sWidth": "15px", "bSortable":false }"""
-        ,false
+        ,true
       ),
       "accept" -> {if (seq.size > 0 ) { SHtml.ajaxButton("Accept into Rudder", {
         () =>  showConfirmPopup(acceptTemplate, "confirmPopup")
