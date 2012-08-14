@@ -23,21 +23,33 @@
       </div>
     </div>
     <hr class="spacer"/> 
+      <div class="inner-portlet">
+        <div class="inner-portlet-header">Search Information</div>
+        <div class="portlet-content">
+         <lift:node.SearchNodes.showQuery/>
+        <br />
+        <lift:authz role="group_write">
+        <div class="bottomButton">
+          <lift:node.SearchNodes.createGroup/>
+        </div>
+        </lift:authz>
+        </div>  
+      </div>
   
-   <fieldset class="searchNodes"><legend>Search nodes</legend>
-    <div id="SearchNodes">
-     <lift:node.SearchNodes.showQuery/>
-    </div>
-    <br/>
-    <lift:authz role="group_write">
-   <div class="bottomButton">
-    <fieldset class="searchNodesAction"><legend>Actions</legend>
-       <lift:node.SearchNodes.createGroup/>
-     </fieldset>
-   </div>
-   </lift:authz>
+<!--    <fieldset class="searchNodes"><legend>Search nodes</legend> -->
+<!--     <div id="SearchNodes"> -->
+<!--     <lift:node.SearchNodes.showQuery/> -->
+<!--     </div> -->
+<!--     <br/> -->
+<!--     <lift:authz role="group_write"> -->
+<!--    <div class="bottomButton"> -->
+<!--     <fieldset class="searchNodesAction"><legend>Actions</legend> -->
+<!--        <lift:node.SearchNodes.createGroup/> -->
+<!--      </fieldset> -->
+<!--    </div> -->
+<!--    </lift:authz> -->
    
-   </fieldset>
+<!--    </fieldset> -->
    </div>
    <br/>
   </div>

@@ -901,7 +901,8 @@ tr.query_line, .query_line td {
 
 .composition {
   text-align:center;
-  padding: 10px 0 0; 
+  padding: 10px 0 0;
+  width: 580px;
 }
 
 .composition span {
