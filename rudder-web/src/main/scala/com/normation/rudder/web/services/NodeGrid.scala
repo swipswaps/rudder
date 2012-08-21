@@ -140,6 +140,7 @@ class NodeGrid(getNodeAndMachine:LDAPFullInventoryRepository) extends Loggable {
             "aaSorting": [[ 0, "asc" ]],
             "sPaginationType": "full_numbers",
             "aoColumns": [ 
+<<<<<<< HEAD
               { "sWidth": "180px" },
               { "sWidth": "200px" },
               { "sWidth": "100px" } %s
@@ -147,6 +148,13 @@ class NodeGrid(getNodeAndMachine:LDAPFullInventoryRepository) extends Loggable {
             "sDom": '<"dataTables_wrapper_top"fl>rt<"dataTables_wrapper_bottom"ip>'
           });
             """.format(tableId,searchable,paginate,aoColumns).replaceAll("#table_var#",jsVarNameForId(tableId))
+=======
+              { "sWidth": "20%%" },
+              { "sWidth": "25%%" },
+              { "sWidth": "15%%" } %s
+            ]
+          });moveFilterAndPaginateArea('#%s');""".format(tableId,searchable,paginate,aoColumns,tableId).replaceAll("#table_var#",jsVarNameForId(tableId))
+>>>>>>> c1f676b7621f1d37c0eeb80bd7a98842b5a61b0b
         ) &
         
         initJsCallBack(tableId)
@@ -160,21 +168,24 @@ class NodeGrid(getNodeAndMachine:LDAPFullInventoryRepository) extends Loggable {
    * initialization.
    */
   def initJsCallBack(tableId:String) : JsCmd = {
+<<<<<<< HEAD
       JsRaw("""$('tr.curspoint', #table_var#.fnGetNodes() ).each( function () {
+=======
+      JsRaw("""$( #table_var#.fnGetNodes() ).each( function () {
+>>>>>>> c1f676b7621f1d37c0eeb80bd7a98842b5a61b0b
           $(this).click( function () {
-            var nTr = this.parentNode;
-            var opened = jQuery(nTr).prop("open");
+            var opened = $(this).prop("open");
             if (opened && opened.match("opened")) {
-              jQuery(nTr).prop("open", "closed");
-              jQuery(nTr).find("span.listclose").removeClass("listclose").addClass("listopen");
-              #table_var#.fnClose(nTr);
+              $(this).prop("open", "closed");
+              $(this).find("span.listclose").removeClass("listclose").addClass("listopen");
+              #table_var#.fnClose(this);
             } else {
-              jQuery(nTr).prop("open", "opened");
-              jQuery(nTr).find("span.listopen").removeClass("listopen").addClass("listclose");
-              var jsid = jQuery(nTr).attr("jsuuid");
-              var node = jQuery(nTr).attr("nodeid");
-              var ajaxParam = JSON.stringify({"jsid":jsid , "id":jQuery(nTr).attr("nodeid") , "status":jQuery(nTr).attr("nodeStatus")});
-              #table_var#.fnOpen( nTr, fnFormatDetails(jsid), 'details' );
+              $(this).prop("open", "opened");
+              $(this).find("span.listopen").removeClass("listopen").addClass("listclose");
+              var jsid = $(this).attr("jsuuid");
+              var node = $(this).attr("nodeid");
+              var ajaxParam = JSON.stringify({"jsid":jsid , "id":$(this).attr("nodeid") , "status":$(this).attr("nodeStatus")});
+              #table_var#.fnOpen( this, fnFormatDetails(jsid), 'details' );
               %s;
             }
           } );
@@ -202,7 +213,7 @@ class NodeGrid(getNodeAndMachine:LDAPFullInventoryRepository) extends Loggable {
   
   def display(servers:Seq[Srv], tableId:String, columns:Seq[(Node,Srv => NodeSeq)]=Seq(), aoColumns:String ="") : NodeSeq = {
     //bind the table
-    <table id={tableId} cellspacing="0">{
+    <table id={tableId} class="fixedlayout" cellspacing="0">{
     bind("servergrid",tableTemplate,
       "header" -> (columns flatMap { c => <th>{c._1}<span/></th> }),
       "lines" -> ( servers.flatMap { case s@Srv(id,status, hostname,ostype,osname,osFullName,ips,creationDate) =>
@@ -211,7 +222,7 @@ class NodeGrid(getNodeAndMachine:LDAPFullInventoryRepository) extends Loggable {
         (".hostname *" #> {(if(isEmpty(hostname)) "(Missing host name) " + id.value else hostname)} &
          ".fullos *" #> osFullName &
          ".ips *" #> (ips.flatMap{ ip => <div class="ip">{ip}</div> }) & // TODO : enhance this
-         ".other" #> (columns flatMap { c => <td>{c._2(s)}</td> }) &
+         ".other" #> (columns flatMap { c => <td style="overflow:hidden">{c._2(s)}</td> }) &
          ".nodetr [jsuuid]" #> {id.value.replaceAll("-","")} &
          ".nodetr [nodeid]" #> {id.value} &
          ".nodetr [nodestatus]" #> {status.name}

@@ -85,6 +85,26 @@
 <component:form>
   <div id="editForm" class="object-details">
     <lift:authz role="directive_edit">
+<<<<<<< HEAD
+=======
+    <fieldset class="topLevelAction">
+      <p class="clearable">
+        This is the zone for top level actions which does not take into account
+        modifications done in the edit zone.
+      </p>
+
+      <legend>Modify Directive status</legend>
+
+      <div id="removeAction" class="twoColumns">
+      </div>
+      <div id="desactivateAction" class="twoColumns twoColumnsRight">
+      </div>
+      <div class="disableNotice">
+        Note: A Directive's status may be Enabled, but it will be effectively disabled
+        if the Technique it's based on is disabled.
+       </div>
+    </fieldset>
+>>>>>>> c1f676b7621f1d37c0eeb80bd7a98842b5a61b0b
 	</lift:authz>
     <fieldset class="editZone">
       <legend>Directive settings</legend>
