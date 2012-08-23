@@ -154,7 +154,7 @@ class SrvGrid {
               { "sWidth": "180px" },
               { "sWidth": "300px" } %s
             ],
-            "sDom": '<"dataTables_wrapper_top"fl>rt<"dataTables_wrapper_bottom"ip>'
+            "sDom": '<"nodeGrid_wrapper_top"fl>rt<"nodeGrid_wrapper_bottom"ip>'
           });
           $('.dataTables_filter input').attr("placeholder", "Search");
           """.format(tableId,paginate,aoColumns).replaceAll("#table_var#",jsVarNameForId(tableId))

@@ -560,6 +560,24 @@ div#Detail {
 	margin: 10px 10px 0px 5px;
 }
 
+.nodeGrid_wrapper_top {
+  padding: 6px;
+  overflow: hidden;
+  display: inline-block; 
+  display: block; 
+  border-top: 1px solid #B4B3A8;
+  border-right: 1px solid #B4B3A8;
+  border-left: 1px solid #B4B3A8;
+}
+
+.nodeGrid_wrapper_bottom {
+  padding: 6px;
+  overflow: hidden;
+  display: inline-block; 
+  display: block;
+  border: 1px solid #B4B3A8;
+}
+
 .dataTables_wrapper_top {
   padding: 6px;
   overflow: hidden;
@@ -927,7 +945,8 @@ tr.query_line, .query_line td {
 
 table#serverGrid {
   width: 545px;
-  
+  border-left: 1px solid #B4B3A8;
+  border-right: 1px solid #B4B3A8;  
 }
 
 table#serverGrid tbody td {
