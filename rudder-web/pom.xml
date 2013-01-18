@@ -79,12 +79,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/agpl.html>.
       <version>${rudder-version}</version>
     </dependency>
     
+    <!--  Not sure if we have to keep that dependency
+    plus the actually don't work...
     <dependency>
-      <groupId>net.liftweb</groupId>
-      <artifactId>lift-widgets_${scala-lift-version}</artifactId>
-      <version>${lift-version}</version>
+      <groupId>net.liftmodules</groupId>
+      <artifactId>widgets_2.10</artifactId>
+      <version>2.5-SNAPSHOT-1.2-SNAPSHOT</version>
     </dependency>
-    
+    -->
     <!-- it seems to not be resolved, don't know why -->
     <dependency>
       <groupId>com.thoughtworks.paranamer</groupId>

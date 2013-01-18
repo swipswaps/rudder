@@ -11,7 +11,11 @@ import com.normation.rudder.services.system.DatabaseManager
 /*
  * Clean action definition, this can be used for more usage in the future
  */
-case class CleanReportAction(name:String,past:String,continue:String,act:DateTime => Box[Int]) {
+trait CleanReportAction {
+  def name:String
+  def past:String
+  def continue:String
+  def act:DateTime => Box[Int]
   val logger = ReportLogger
   def cleanReports(date:DateTime) : JsCmd = {
     logger.info("%s all reports before %s".format(continue,date))
@@ -36,6 +40,16 @@ case class CleanReportAction(name:String,past:String,continue:String,act:DateTim
   }
 }
 
-case class ArchiveAction(dbManager:DatabaseManager) extends CleanReportAction("Archive","Archived","Archiving",dbManager.archiveEntries _)
+case class ArchiveAction(dbManager:DatabaseManager) extends CleanReportAction {
+  val name = "Archive"
+  val past = "Archived"
+  val continue = "Archiving"
+  val act = dbManager.archiveEntries _
+}
 
-case class DeleteAction(dbManager:DatabaseManager) extends CleanReportAction("Delete","Deleted","Deleting",dbManager.deleteEntries _)
+case class DeleteAction(dbManager:DatabaseManager)extends CleanReportAction {
+  val name = "Delete"
+  val past = "Deleted"
+  val continue = "Deleting"
+  val act = dbManager.deleteEntries _
+}

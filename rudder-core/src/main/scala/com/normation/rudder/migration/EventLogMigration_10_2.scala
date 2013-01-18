@@ -58,8 +58,7 @@ import com.normation.utils.XmlUtils
 import com.normation.rudder.domain.logger._
 
 import net.liftweb.common._
-import net.liftweb.util.Helpers.strToCssBindPromoter
-import net.liftweb.util.Helpers.tryo
+import net.liftweb.util.Helpers._
 import net.liftweb.util.IterableFunc.itNodeSeq
 import net.liftweb.util.StringPromotable.intToStrPromo
 
