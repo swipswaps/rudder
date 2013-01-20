@@ -653,7 +653,7 @@ class XmlMigration_10_2 {
       fileFormatOK <- TestFileFormat(xml, Constants.XML_FILE_FORMAT_1_0)
       migrated     <- TestIsElem((
                         "node [fileFormat]" #> Constants.XML_FILE_FORMAT_2
-                      )(xml)) 
+                      ).apply(xml)) 
     } yield {
       migrated
     }
