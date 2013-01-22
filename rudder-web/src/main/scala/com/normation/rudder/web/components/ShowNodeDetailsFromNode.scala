@@ -62,7 +62,7 @@ import Helpers._
 import net.liftweb.http.js._
 import JsCmds._ // For implicits
 import JE._
-import net.liftweb.widgets.autocomplete._
+import net.liftmodules.widgets.autocomplete._
 
 
 

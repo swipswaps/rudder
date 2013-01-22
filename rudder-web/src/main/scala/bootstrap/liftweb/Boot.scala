@@ -42,7 +42,7 @@ import net.liftweb.sitemap._
 import net.liftweb.sitemap.Loc._
 import Helpers._
 import net.liftweb.http.js.jquery.JQuery14Artifacts
-import net.liftweb.widgets.autocomplete.AutoComplete
+import net.liftmodules.widgets.autocomplete.AutoComplete
 import javax.servlet.UnavailableException
 import LiftSpringApplicationContext.inject
 import com.normation.plugins.RudderPluginDef

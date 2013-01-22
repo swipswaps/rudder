@@ -57,7 +57,7 @@ import Helpers._
 import net.liftweb.http.js._
 import JsCmds._
 import JE._
-import net.liftweb.widgets.autocomplete._
+import net.liftmodules.widgets.autocomplete._
 import com.normation.exceptions.TechnicalException
 import com.normation.inventory.ldap.core.LDAPConstants.OC_NODE
 import com.normation.rudder.domain.queries.Or

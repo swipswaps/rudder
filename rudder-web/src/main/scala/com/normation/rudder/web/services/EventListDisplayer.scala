@@ -110,7 +110,7 @@ class EventListDisplayer(
         ".logType *" #> S.?("rudder.log.eventType.names." + event.eventType.serialize) &
         ".logDescription *" #> displayDescription(event) 
       })
-     )(dataTableXml(gridName)) 
+     ).apply(dataTableXml(gridName)) 
   }
   
   
@@ -787,7 +787,7 @@ class EventListDisplayer(
               </ul>
               {(
                 "#isEnabled *" #> mapSimpleDiff(modDiff.modIsEnabled)
-              )(liModDetailsXML("isEnabled", "Activation status"))
+              ).apply(liModDetailsXML("isEnabled", "Activation status"))
               }
               { reasonHtml }
               { xmlParameters(event.id) }
@@ -926,8 +926,8 @@ class EventListDisplayer(
 
   private[this] def displayDiff(tag:String)(xml:NodeSeq) = 
       "From value '%s' to value '%s'".format(
-          ("from ^*" #> "X" & "* *" #> (x => x))(xml) 
-        , ("to ^*" #> "X" & "* *" #> (x => x))(xml)
+          ("from ^*" #> "X" & "* *" #> ( (x:NodeSeq) => x))(xml) 
+        , ("to ^*" #> "X" & "* *" #> ( (x:NodeSeq) => x))(xml)
       )
 
   private[this] def groupNodeSeqLink(id: NodeGroupId): NodeSeq = {
@@ -957,7 +957,7 @@ class EventListDisplayer(
     }
     (
       ".groupSeparator" #> ", "
-    )(res)
+    ).apply(res)
   }
   
   private[this] def nodeNodeSeqLink(id: NodeId): NodeSeq = {
@@ -981,7 +981,7 @@ class EventListDisplayer(
     }
     (
       ".groupSeparator" #> ", "
-    )(res)
+    ).apply(res)
   }
   
   private[this] def directiveTargetDetails(set: Set[DirectiveId]): NodeSeq = {
@@ -1007,7 +1007,7 @@ class EventListDisplayer(
           }
           (
             ".groupSeparator" #> ", "
-          )(res)
+          ).apply(res)
       }
     }
   }
