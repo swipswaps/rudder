@@ -200,7 +200,7 @@ class CreateCategoryOrGroupPopup(
   }
 
   private[this] val piContainer = new WBSelectField("Parent category",
-      (categories.open_!.map(x => (x.id.value -> x.name))),
+      (categories.getOrElse(Seq()).map(x => (x.id.value -> x.name))),
       "") {
     override def errorClassName = "threeColErrors"
     override def className = "rudderBaseFieldSelectClassName"

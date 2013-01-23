@@ -739,7 +739,7 @@ class RuleGrid(
 
 }
 
-trait ComplianceLevel 
+sealed trait ComplianceLevel 
 
 
 case object Applying extends ComplianceLevel

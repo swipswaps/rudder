@@ -104,8 +104,8 @@ class NodeSummaryServiceImpl(
 
   override def find(dit:InventoryDit,ids:NodeId*) : Box[Seq[Srv]] = 
     for {
-      con <- ldap
-      val srvs = ids map { id => con.get(dit.NODES.NODE.dn(id),Srv.ldapAttributes.toSeq:_*) } collect { case Full(se) => makeSrv(se) }
+      con  <- ldap
+      srvs =  ids map { id => con.get(dit.NODES.NODE.dn(id),Srv.ldapAttributes.toSeq:_*) } collect { case Full(se) => makeSrv(se) }
     } yield srvs.flatten
 
 }

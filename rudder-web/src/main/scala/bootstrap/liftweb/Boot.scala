@@ -75,7 +75,7 @@ class Boot extends Loggable {
     LiftRules.ajaxPostTimeout = 30000
 
     // We don't want to reload the page 
-    LiftRules.redirectAjaxOnSessionLoss = false;
+    LiftRules.redirectAsyncOnSessionLoss = false;
     //we don't want to retry on ajax timeout, as it may have big consequence
     //when it's (for example) a deploy
     LiftRules.ajaxRetryCount = Full(1)
@@ -84,12 +84,12 @@ class Boot extends Loggable {
     LiftRules.addToPackages("com.normation.rudder.web")
     
     // REST API
-    LiftRules.statelessDispatchTable.append(RestStatus)
-    LiftRules.statelessDispatchTable.append(inject[RestDeploy])
-    LiftRules.statelessDispatchTable.append(inject[RestDyngroupReload])
-    LiftRules.statelessDispatchTable.append(inject[RestTechniqueReload])
-    LiftRules.statelessDispatchTable.append(inject[RestArchiving])
-    LiftRules.statelessDispatchTable.append(inject[RestGetGitCommitAsZip])
+    LiftRules.statelessDispatch.append(RestStatus)
+    LiftRules.statelessDispatch.append(inject[RestDeploy])
+    LiftRules.statelessDispatch.append(inject[RestDyngroupReload])
+    LiftRules.statelessDispatch.append(inject[RestTechniqueReload])
+    LiftRules.statelessDispatch.append(inject[RestArchiving])
+    LiftRules.statelessDispatch.append(inject[RestGetGitCommitAsZip])
   
     // URL rewrites
     LiftRules.statefulRewrite.append {

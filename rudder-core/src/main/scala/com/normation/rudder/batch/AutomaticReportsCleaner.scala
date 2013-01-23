@@ -242,9 +242,9 @@ case object ActiveCleaner extends CleanerState
 
 // Messages the cleaner can receive.
 // Ask to clean database (need to be in active state).
-case class CleanDatabase
+case object CleanDatabase
 // Ask to check if cleaning has to be launched (need to be in idle state).
-case class CheckLaunch
+case object CheckLaunch
 
 /**
  *  A class that periodically check if the Database has to be cleaned.

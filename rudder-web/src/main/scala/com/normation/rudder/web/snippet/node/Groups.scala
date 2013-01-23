@@ -388,7 +388,7 @@ class Groups extends StatefulSnippet with SpringExtendableSnippet[Groups] with L
           )
       )
     }
-    override def children = category.children.flatMap(x => x:Box[JsTreeNode]) ++ category.items.map(x => x:JsTreeNode)
+    override def children = category.children.flatMap(x => nodeGroupCategoryIdToJsTreeNode(x)) ++ category.items.map(x => policyTargetInfoToJsTreeNode(x))
     override val attrs = 
       ( "rel" -> { if(category.id == rootCategoryId) "root-category" else "category" } ) :: 
       ( "catId" -> category.id.value ) ::
@@ -403,7 +403,7 @@ class Groups extends StatefulSnippet with SpringExtendableSnippet[Groups] with L
 
 
   //fetch server group category id and transform it to a tree node
-  private implicit def nodeGroupCategoryIdToJsTreeNode(id:NodeGroupCategoryId) : Box[JsTreeNode] = {
+  private[this] def nodeGroupCategoryIdToJsTreeNode(id:NodeGroupCategoryId) : Box[JsTreeNode] = {
     groupCategoryRepository.getGroupCategory(id) match {
       //remove sytem category
       case Full(group) => group.isSystem match {
@@ -418,11 +418,11 @@ class Groups extends StatefulSnippet with SpringExtendableSnippet[Groups] with L
   }
   
   //fetch server group id and transform it to a tree node
-  private implicit def policyTargetInfoToJsTreeNode(targetInfo:RuleTargetInfo) : JsTreeNode = {
+  private[this] def policyTargetInfoToJsTreeNode(targetInfo:RuleTargetInfo) : JsTreeNode = {
     targetInfo.target match {
       case GroupTarget(id) => 
         nodeGroupRepository.getNodeGroup(id) match {
-          case Full(group) => group
+          case Full(group) => nodeGroupToJsTreeNode(group)
           case _ => new JsTreeNode {
             override def body = <span class="error">Can not find node {id.value}</span>
             override def children = Nil
@@ -451,7 +451,7 @@ class Groups extends StatefulSnippet with SpringExtendableSnippet[Groups] with L
   /**
    * Transform a WBNodeGroup into a JsTree leaf.
    */
-  private implicit def nodeGroupToJsTreeNode(group : NodeGroup) : JsTreeNode = new JsTreeNode {
+  private[this] def nodeGroupToJsTreeNode(group : NodeGroup) : JsTreeNode = new JsTreeNode {
     //ajax function that update the bottom
     def onClickNode() : JsCmd = {
       showGroupSection(group)

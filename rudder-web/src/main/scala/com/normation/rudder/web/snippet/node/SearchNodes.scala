@@ -261,12 +261,14 @@ class SearchNodes extends StatefulSnippet with Loggable {
   }
   
   private[this] def showPopup() : JsCmd = {
-    setCreationPopup(searchNodeComponent.is.open_!.getQuery(),
-                     searchNodeComponent.is.open_!.getSrvList() )
-    //update UI
-    SetHtml("createGroupContainer", createPopup) &
-    JsRaw( """ createPopup("createGroupPopup",300,400) """)
+    searchNodeComponent.is match {
+      case Full(r) => setCreationPopup(r.getQuery, r.getSrvList)
+        //update UI
+        SetHtml("createGroupContainer", createPopup) &
+        JsRaw( """ createPopup("createGroupPopup",300,400) """)
 
+      case eb:EmptyBox => Alert("Error when trying to retrieve the resquest, please try again")
+    }
   }
   
   

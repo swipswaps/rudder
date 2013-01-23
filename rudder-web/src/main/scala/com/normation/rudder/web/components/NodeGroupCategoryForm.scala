@@ -71,7 +71,17 @@ class NodeGroupCategoryForm(
   val groupCategoryRepository = inject[NodeGroupCategoryRepository]
   private[this] val uuidGen = inject[StringUuidGenerator]
 
-  val categories = groupCategoryRepository.getAllNonSystemCategories.open_!.filter(x => x.id != _nodeGroupCategory.id)
+  val categories = groupCategoryRepository.getAllNonSystemCategories match {
+    case eb:EmptyBox => 
+      val f = eb  ?~! "Can not get Group root category"
+      logger.error(f.messageChain)
+      f.rootExceptionCause.foreach(ex => 
+        logger.error("Exception was:", ex)
+      )
+      Seq()
+    case Full(cats) => cats.filter(x => x.id != _nodeGroupCategory.id)
+  }
+  
   val parentCategory = groupCategoryRepository.getParentGroupCategory(nodeGroupCategory.id )
   
   val parentCategoryId = parentCategory match {
