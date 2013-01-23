@@ -232,7 +232,7 @@ class Groups extends StatefulSnippet with SpringExtendableSnippet[Groups] with L
   private[this] def buildGroupTree(selectedNode:String) : NodeSeq = {
     (
       <div id={htmlId_groupTree}>
-        <ul>{groupCategoryRepository.getRootCategory.toXml}</ul>
+        <ul>{ nodeGroupCategoryToJsTreeNode(groupCategoryRepository.getRootCategory).toXml }</ul>
       </div>
     ) ++ Script(OnLoad(
       //build jstree and
@@ -373,7 +373,7 @@ class Groups extends StatefulSnippet with SpringExtendableSnippet[Groups] with L
    *   - groups
    * - 
    */
-  private implicit def nodeGroupCategoryToJsTreeNode(category:NodeGroupCategory) : JsTreeNode = new JsTreeNode {
+  private[this] def nodeGroupCategoryToJsTreeNode(category:NodeGroupCategory) : JsTreeNode = new JsTreeNode {
     def onClickCategory(category:NodeGroupCategory) : JsCmd = {
       displayACategory(category)
     }
@@ -408,7 +408,7 @@ class Groups extends StatefulSnippet with SpringExtendableSnippet[Groups] with L
       //remove sytem category
       case Full(group) => group.isSystem match {
         case true => Empty
-        case false => Full(group)
+        case false => Full(nodeGroupCategoryToJsTreeNode(group))
       }
       case e:EmptyBox => 
         val f = e ?~! "Error while fetching Technique category %s".format(id)

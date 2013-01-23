@@ -69,7 +69,6 @@ class Boot extends Loggable {
     checks.checks()
     
     LiftRules.early.append( {req: provider.HTTPRequest => req.setCharacterEncoding("UTF-8")})
-    LiftRules.jsArtifacts = JQuery14Artifacts
     LiftRules.ajaxStart = Full(() => LiftRules.jsArtifacts.show("ajax-loader").cmd)
     LiftRules.ajaxEnd = Full(() => LiftRules.jsArtifacts.hide("ajax-loader").cmd)
     LiftRules.ajaxPostTimeout = 30000
