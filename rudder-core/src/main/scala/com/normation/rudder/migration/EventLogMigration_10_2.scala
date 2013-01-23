@@ -129,7 +129,7 @@ class MigrationEventLogRepository(squerylConnectionProvider : SquerylConnectionP
     squerylConnectionProvider.ourTransaction {
       val q = from(MigrationEventLogTable.migrationEventLog)(line => 
         select(line)
-        orderBy(line.id desc)
+        orderBy(line.id.desc)
       )
       
       q.page(0,1).toList.headOption
