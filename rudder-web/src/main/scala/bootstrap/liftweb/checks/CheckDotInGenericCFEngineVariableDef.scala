@@ -60,6 +60,8 @@ class CheckDotInGenericCFEngineVariableDef (
   , uuid   : StringUuidGenerator
 ) extends BootstrapChecks {
 
+  override val description = "Check that CFEngine variable names don't contain '.'"
+
   private[this] val logger = new Logger {
     override protected def _logger = LoggerFactory.getLogger("migration")
     val defaultErrorLogger : Failure => Unit = { f =>
